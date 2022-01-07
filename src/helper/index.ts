@@ -1,0 +1,51 @@
+export function clientChecker() : boolean {
+    if(typeof window !== "undefined" && typeof document !== "undefined") {
+        return true
+    }else return false;
+}
+
+
+export const debounce = (func: Function , wait : number) => {
+    let timeoutId : number | null | undefined;
+    return function executedFunction(...args : []) {
+        const later = () => {
+        timeoutId = null;
+        func(...args);
+        };
+        clearTimeout(timeoutId as number);
+        timeoutId = window.setTimeout(later, wait);
+    };
+};
+
+
+export function selfClearTimeout(callback : Function , timeout : number) {
+    let timer = window.setTimeout(() => {
+        callback();
+        window.clearTimeout(timer);
+    } , timeout);
+}
+
+
+export function deepClone(object : Object) {
+    return JSON.parse(JSON.stringify(object));
+}
+
+
+export function findDOMPath(element : HTMLElement) : string {
+    const pathStack = [];
+    
+    return (function innerRecursive(parentNode : HTMLElement) {
+        if(parentNode?.parentElement) {
+            const currentElementName = (() => {
+                const elementTag = parentNode.tagName.toLowerCase();
+                if(parentNode.className || parentNode.classList.length) {
+                    return `${elementTag}.${parentNode.className}`;
+                }else return elementTag;
+            })();
+
+            pathStack.push(currentElementName);
+            innerRecursive(parentNode.parentElement);
+        }
+        return pathStack;
+    })(element).reverse().join(" ");
+}
