@@ -1,4 +1,4 @@
-import { debounce, deepClone, findDOMPath, selfClearTimeout } from "./helper/index";
+import { debounce, deepClone, findClickPos, findDOMPath, selfClearTimeout } from "./helper/index";
 
 interface IBrowserDetailsMethod {
     version : number | string;
@@ -32,10 +32,9 @@ interface IRaftaUserData {
     browser : IBrowserDetailsMethod;
 }
 
-type TEventType = "click" | "type" | "scroll" | "mousemove"
+type TEventType = "click" | "type" | "scroll" | "mousemove" | "resize" | "focus";
 
 interface IRaftaEvent {
-    timestamp : number;
     event : TEventType;
     data : any;
 }
@@ -58,10 +57,12 @@ class Rafta {
     eventStore : IRaftaEventStore;
     syncTimeout : number;
     syncTimerId : number | undefined;
+    focusObserverId : NodeJS.Timer | undefined;
     // mouseEventDebounce : number;
     // resizeEventDebounce : number;
     scrollEventDebounce : number;
     mouseMoveDebounce : number;
+    resizeDebounce : number;
     initialScrollEventListenerDelayForAttachment : number;
     shouldPreventServerConnectOnUserSleep : boolean;
 
@@ -78,6 +79,7 @@ class Rafta {
         this.syncTimeout = 3000;
         this.scrollEventDebounce = 9;
         this.mouseMoveDebounce = 8;
+        this.resizeDebounce = 100;
         this.shouldPreventServerConnectOnUserSleep = true;
 
         this.eventStore = { events : [] };
@@ -238,7 +240,11 @@ class Rafta {
     }
     
     private eventDispatcher(targetEvent : IRaftaEvent) {
-        this.eventStore.events.push(targetEvent);
+        const enhancedTargetEventWithTime = {
+            ...targetEvent,
+            timestamp : Date.now()
+        }
+        this.eventStore.events.push(enhancedTargetEventWithTime);
     }
 
 
@@ -252,7 +258,6 @@ class Rafta {
 
         
         this.eventDispatcher({
-            timestamp : Date.now(),
             event : "scroll",
             data : scrollPx
         })
@@ -262,26 +267,29 @@ class Rafta {
         const targetElement = <HTMLElement>e.target;
         
         const selectedElementPath = findDOMPath(targetElement);
-        
+        const selectedElementPosition = findClickPos(e);
+
         this.eventDispatcher({
             event : "click",
-            timestamp : Date.now(),
             data : {
                 path : selectedElementPath,
+                position : selectedElementPosition,
             }
         })
 
     }
 
-    typeHandler(e : Event) {
-        // console.log('typed');
+    typeHandler(e : KeyboardEvent) {
+        this.eventDispatcher({
+            event : "type",
+            data : e.key,
+        })
     }
 
     mouseMoveHandler(e : MouseEvent) {
         
         this.eventDispatcher({
             event : "mousemove",
-            timestamp : Date.now(),
             data : {
                 position : {
                     x : e.clientX,
@@ -291,8 +299,20 @@ class Rafta {
         })
     }
 
+    focusHandler(isFocused : boolean) {
+        this.eventDispatcher({
+            event : "focus",
+            data : isFocused,
+        })
+    }
+
     resizeHandler() {
-        // console.log('resize');
+        this.eventDispatcher({
+            event : "resize",
+            data : {
+                viewport : this.getUserViewport(),
+            }
+        })
     }
 
     userScrollEvent() {
@@ -301,13 +321,12 @@ class Rafta {
         } , this.initialScrollEventListenerDelayForAttachment);
     }
 
-
     userClickEvent() {
         document.addEventListener("click" , this.clickHandler.bind(this));
     }
 
     userTypeEvent() {
-        document.addEventListener("keydown" , this.typeHandler);
+        document.addEventListener("keydown" , this.typeHandler.bind(this));
     }
 
     userMouseMoveEvent() {
@@ -315,14 +334,33 @@ class Rafta {
     }
 
     userResizeEvent() {
-        document.addEventListener("resize" , this.resizeHandler);
+        window.addEventListener("resize" , debounce(this.resizeHandler.bind(this) , this.resizeDebounce));
+    }
+
+    userFocusEvent() {
+        let previousFocusStatus = true; // in default set by 'true' , because when user inter in app , the tab or window is currently active and focused
+        let timer = setInterval(() => {
+            const hasFocusedOnCurrentDocument = document.hasFocus();
+            if(hasFocusedOnCurrentDocument !== previousFocusStatus) {
+                this.focusHandler(hasFocusedOnCurrentDocument);
+                previousFocusStatus = hasFocusedOnCurrentDocument;
+            }
+        } , 1000);
+
+        this.focusObserverId = timer;
+
+        // return function unsubscribeFocusEvent() {
+        //     clearInterval(timer);
+        // }
     }
 
     attachEventsListener() {
         this.userScrollEvent();
         this.userClickEvent();
         this.userMouseMoveEvent();
-        // this.userTypeEvent();
+        this.userTypeEvent();
+        this.userResizeEvent();
+        this.userFocusEvent();
     }
 
     destroyedEventsListener() {
@@ -330,7 +368,9 @@ class Rafta {
         document.removeEventListener("scroll" , this.scrollHandler);
         document.removeEventListener("click" , this.clickHandler);
         document.removeEventListener("keydown" , this.typeHandler);
-        document.removeEventListener("mousemove" , this.mouseMoveHandler)
+        document.removeEventListener("mousemove" , this.mouseMoveHandler);
+        clearInterval(this.focusObserverId)
+        
     }
 }
 

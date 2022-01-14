@@ -31,6 +31,15 @@ export function deepClone(object : Object) {
 }
 
 
+function detectElementIdentifier(element : HTMLElement) {
+    if(element.id) {
+        return `#${element.id}`
+    }
+    else if(element.className) {
+        return `.${element.className}`
+    }else return "";
+}
+
 export function findDOMPath(element : HTMLElement) : string {
     const pathStack = [];
     
@@ -38,9 +47,7 @@ export function findDOMPath(element : HTMLElement) : string {
         if(parentNode?.parentElement) {
             const currentElementName = (() => {
                 const elementTag = parentNode.tagName.toLowerCase();
-                if(parentNode.className || parentNode.classList.length) {
-                    return `${elementTag}.${parentNode.className}`;
-                }else return elementTag;
+                return `${elementTag}${detectElementIdentifier(parentNode)}`
             })();
 
             pathStack.push(currentElementName);
@@ -48,4 +55,15 @@ export function findDOMPath(element : HTMLElement) : string {
         }
         return pathStack;
     })(element).reverse().join(" ");
+}
+
+
+export function findClickPos(e : MouseEvent) : { x : number; y : number } {
+    const x = e.clientX;
+    const y = e.clientY;
+
+    return {
+        x , 
+        y
+    }
 }
