@@ -67,3 +67,13 @@ export function findClickPos(e : MouseEvent) : { x : number; y : number } {
         y
     }
 }
+
+
+
+export function createErrorFileName(e : ErrorEvent) {
+    const baseFileName = e.filename;
+    const colNumber = e.colno;
+    const lineNumber = e.lineno;
+
+    return `${baseFileName}:${lineNumber}-${colNumber}`;
+}

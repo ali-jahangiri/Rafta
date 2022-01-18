@@ -1,5 +1,4 @@
 import Rafta from "./Rafta";
-
 const raftaIns = new Rafta();
-
-raftaIns.initializer();
+const PACKAGE_NAME = "test.com"
+raftaIns.init(PACKAGE_NAME);

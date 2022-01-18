@@ -1,7 +1,10 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/index.ts',
+  entry: [
+    'regenerator-runtime/runtime',
+    './src/index.ts',
+  ],
   devtool : "source-map",
   devServer : {
     static : './',
