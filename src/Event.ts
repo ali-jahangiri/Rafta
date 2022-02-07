@@ -24,6 +24,20 @@ class RaftaEvent {
         this.shouldPreventServerConnectOnUserSleep = true;
 
         this.eventStore = eventStore;
+
+        // var observer = new PerformanceObserver(list => {
+        //     list.getEntries().forEach(entry => {
+        //       // Display each reported measurement on console
+        //       if (console) {
+        //         console.log("Name: "       + entry.name      +
+        //                     ", Type: "     + entry.entryType +
+        //                     ", Start: "    + entry.startTime +
+        //                     ", Duration: " + entry.duration  + "\n");
+        //       }
+        //     })
+        //   });
+        // observer.observe({entryTypes: ['resource', 'mark', 'measure' , 'navigation' , 'longtask' , 'element' , 'paint']});
+        // performance.mark('registered-observer');
     }
 
     private checkIsUserSleep() : boolean {

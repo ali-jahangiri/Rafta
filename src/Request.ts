@@ -19,15 +19,25 @@ class RaftaRequest {
         // this.http()
         return new Promise((res) => {
             res(true)
-        })    
+        })
     }
 
     identifyUserRequest(userEntireData : IUserEntireData) {
         // identify current user width user basic information
     }
 
+
+
     private networkRequestRejectEvent(fetcherType : TFetcherType , error : INetworkError ) {
 
+    }
+
+    overrideBrowserPromise() {
+        // class Promise extends window.Promise {
+        //     constructor(executor) {
+        //         super(executor);
+        //     }
+        // }
     }
 
     overrideBrowserFetcher() {
@@ -37,7 +47,7 @@ class RaftaRequest {
                 return await origFetch(...args) 
                     .then(res => {
                         if(!res.ok && (res.status < 200 || res.status >= 300)) {
-                            throw new Error()
+                            throw new Error();
                         }else resolve(res);
                     })
                     .catch(err => {
@@ -46,48 +56,8 @@ class RaftaRequest {
                     })
             })();
         })
-
-        fetch('https://jsonplaceholder.typicode.com/todos/990')
-            .then(data => data.json())
-            .then(data => console.log(data))
-            .catch(err => {
-                console.log(err);
-                
-            })
     }
 }
 
 
 export default RaftaRequest;
-
-
-
-
-// const {fetch: origFetch} = window;
-//         window.fetch = () => async (...args) => {
-//         console.log("fetch called with args:", args);
-//         const response = await origFetch(...args);
-        
-//         /* work with the cloned response in a separate promise
-//             chain -- could use the same chain with `await`. */
-//         return response
-//             .clone()
-//             .json()
-//             .then(body => console.log("intercepted response:", body))
-//             .catch(err => console.error(err))
-//         ;
-            
-//         /* the original response can be resolved unmodified: */
-//         //return response;
-        
-//         /* or mock the response: */
-//         // return {
-//         //     ok: true,
-//         //     status: 200,
-//         //     json: async () => ({
-//         //     userId: 1,
-//         //     id: 1,
-//         //     title: "Mocked!!",
-//         //     completed: false
-//         //     })
-//         // };

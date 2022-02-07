@@ -12,10 +12,32 @@ class RaftaLifecycle {
 
     beforeDOMLoad(callBack : () => void) {
         callBack();
+        // const observer = new PerformanceObserver((list) => {
+        //     for (const entry of list.getEntries()) {
+        //       // `name` will be either 'first-paint' or 'first-contentful-paint'.
+        //       const metricName = entry.name;
+        //       const time = Math.round(entry.startTime + entry.duration);
+          
+        //       console.log('send', 'event', {
+        //         eventCategory: 'Performance Metrics',
+        //         eventAction: metricName,
+        //         eventValue: time,
+        //         nonInteraction: true,
+        //         additional : entry
+        //       });
+        //     }
+        //   });
+          
+        //   // Start observing paint entries.
+        //   observer.observe({entryTypes: ['paint']});
     }
 
     afterDOMLoad(callback : () => void) {
-        window.addEventListener("DOMContentLoaded" , callback)
+        window.addEventListener("DOMContentLoaded" , callback);
+    }
+
+    afterFullDocumentLoad(callback : () => void) {
+        window.addEventListener('load' , callback);
     }
 
     timePeriod(callBack : () => void) {

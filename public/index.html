@@ -6,9 +6,44 @@
     <link rel="stylesheet" href="../src/tempelet/assets/css/main.css" />
     <script src="bundle.js"></script>
     <title>Rafta</title>
+    <script>
+        // var observer = new PerformanceObserver(list => {
+        //   list.getEntries().forEach(entry => {
+        //     // Display each reported measurement on console
+        //     if (console) {
+        //       console.log("Name: "       + entry.name      +
+        //                   ", Type: "     + entry.entryType +
+        //                   ", Start: "    + entry.startTime +
+        //                   ", Duration: " + entry.duration  + "\n");
+        //     }
+        //   })
+        // });
+        // observer.observe({entryTypes: ['resource', 'mark', 'measure' , 'navigation' , 'longtask' , 'element']});
+        // performance.mark('registered-observer');
+    
+        function clicked(elem) {
+            fetch("https://jsonplaceholder.typicode.com/todos")
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById("dynamicContainer");
+                   data.map((el => {
+                       container.innerHTML += `
+                        <div>${el.title}</div>
+                       `
+                   })) 
+                })
+        }
+
+
+
+      </script>
 </head>
 <body>
     <div id="wrapper">
+        <button onclick="clicked()">clickMe</button>
+        <div id="dynamicContainer">
+
+        </div>
 
         <!-- Header -->
             <header id="header">
@@ -55,6 +90,105 @@
                             </span>
                             <a>
                                 <h2>Lorem</h2>
+                                <div class="content">
+                                    <p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+                                </div>
+                            </a>
+                        </article>
+                        <article class="style3">
+                            <span class="image">
+                                <img src="../src/tempelet/images/pic03.jpg" alt="" />
+                            </span>
+                            <a>
+                                <h2>Feugiat</h2>
+                                <div class="content">
+                                    <p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+                                </div>
+                            </a>
+                        </article>
+                        <article class="style3">
+                            <span class="image">
+                                <img src="../src/tempelet/images/pic03.jpg" alt="" />
+                            </span>
+                            <a>
+                                <h2>Feugiat</h2>
+                                <div class="content">
+                                    <p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+                                </div>
+                            </a>
+                        </article>
+                        <article class="style3">
+                            <span class="image">
+                                <img src="../src/tempelet/images/pic03.jpg" alt="" />
+                            </span>
+                            <a>
+                                <h2>Feugiat</h2>
+                                <div class="content">
+                                    <p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+                                </div>
+                            </a>
+                        </article>
+                        <article class="style3">
+                            <span class="image">
+                                <img src="../src/tempelet/images/pic03.jpg" alt="" />
+                            </span>
+                            <a>
+                                <h2>Feugiat</h2>
+                                <div class="content">
+                                    <p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+                                </div>
+                            </a>
+                        </article>
+                        <article class="style3">
+                            <span class="image">
+                                <img src="../src/tempelet/images/pic03.jpg" alt="" />
+                            </span>
+                            <a>
+                                <h2>Feugiat</h2>
+                                <div class="content">
+                                    <p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+                                </div>
+                            </a>
+                        </article>
+                        <article class="style3">
+                            <span class="image">
+                                <img src="../src/tempelet/images/pic03.jpg" alt="" />
+                            </span>
+                            <a>
+                                <h2>Feugiat</h2>
+                                <div class="content">
+                                    <p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+                                </div>
+                            </a>
+                        </article>
+                        <article class="style3">
+                            <span class="image">
+                                <img src="../src/tempelet/images/pic03.jpg" alt="" />
+                            </span>
+                            <a>
+                                <h2>Feugiat</h2>
+                                <div class="content">
+                                    <p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+                                </div>
+                            </a>
+                        </article>
+                        <article class="style3">
+                            <span class="image">
+                                <img src="../src/tempelet/images/pic03.jpg" alt="" />
+                            </span>
+                            <a>
+                                <h2>Feugiat</h2>
+                                <div class="content">
+                                    <p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
+                                </div>
+                            </a>
+                        </article>
+                        <article class="style3">
+                            <span class="image">
+                                <img src="../src/tempelet/images/pic03.jpg" alt="" />
+                            </span>
+                            <a>
+                                <h2>Feugiat</h2>
                                 <div class="content">
                                     <p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
                                 </div>
