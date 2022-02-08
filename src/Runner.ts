@@ -41,6 +41,7 @@ class RaftaRunner {
 
 
     afterFullLoadSetup = () =>{
+        this.performance.afterLoadObservation();
     }
 
 

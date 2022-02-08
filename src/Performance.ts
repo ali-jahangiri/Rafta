@@ -1,3 +1,5 @@
+import BrowserPerformanceObserver, { IBrowserPerformanceObserver } from "./BrowserPerformanceObserver";
+
 interface IRaftaPerformance {
 
 }
@@ -6,27 +8,28 @@ interface IRaftaPerformance {
 
 class RaftaPerformance {
     timeline : [];
-    browserObserver : PerformanceObserver;
-    observeCallbackHolder : () => Function;
-
+    private browserPerformanceObserver : IBrowserPerformanceObserver;
+    
+    
     constructor() {
         this.timeline = [];
-
-        function observeCallbackHolder(entryList) {
-            return (callback : () => void) => {
-                // for (const entry of entryList.getEntriesByName('first-contentful-paint')) {
-                //     console.log('FCP candidate:', entry.startTime, entry);
-                //   }
-                callback(entryList);
-            }
-        }
-
-        this.browserObserver = new PerformanceObserver(observeCallbackHolder);
-
-        this.observeCallbackHolder = observeCallbackHolder(() => {});
+        this.browserPerformanceObserver = new BrowserPerformanceObserver(this.onObservation);
     }
 
-    private browserTabVisibilityChecker(callback : (defaultVisibilityStatus : boolean) => void) {
+    onObservation(entryList : PerformanceObserverEntryList) {
+        
+        for (const entry of entryList.getEntriesByName('first-contentful-paint')) {
+            console.log('FCP candidate:', entry.startTime, entry);
+        }
+        for (const entry of entryList.getEntriesByName("mark")) {
+            console.log(entry.startTime, entry);
+        }
+
+
+        
+    }
+
+    private windowTabVisibilityChecker(callback : (defaultVisibilityStatus : boolean) => void) {
         const currentVisibilityStatus = document?.visibilityState;
         let wasExecuteCallbackOnce = false;
 
@@ -45,13 +48,11 @@ class RaftaPerformance {
         }else window.addEventListener("visibilitychange" , onBrowserVisibilityChangeHandler , true);
     }
     
-    private initialPaintObservation() {
+    private initialRecord() {
+        this.windowTabVisibilityChecker(defaultVisibilityStatus => {
+            // this.browserPerformanceObserver.observer.observe({type: 'paint', buffered: true});
+        })
 
-        
-
-        // this.browserObserver.takeRecords()
-        
-        
         // const resources = window.performance.getEntriesByType("paint");
         // resources.forEach(resource => {
         //     if(resource.name === "first-contentful-paint")
@@ -60,17 +61,19 @@ class RaftaPerformance {
     }
 
     afterDOMLoadObservation() {
-
-        console.log(this.observeCallbackHolder());
-        
-        // this.browserTabVisibilityChecker(defaultVisibilityStatus => {
-        //     this.browserObserver.observe({type: 'paint', buffered: true});
-        // })
+        this.initialRecord();
     }
 
 
     afterLoadObservation() {
-
+        console.log("afterLoadObservation" , performance.now());
+        
+        
+                
+        console.log('====================================?' , performance.now());
+        var loadTime = window.performance.timing.domContentLoadedEventEnd-window.performance.timing.unloadEventStart; 
+        let other = performance.timing.domComplete
+        console.log('Page load time is '+ loadTime , other)
     }
 
     setRuntimeObservation() {
@@ -78,7 +81,7 @@ class RaftaPerformance {
     }
 
 
-    setMarker() {
+    private setMarker() {
 
     }
 }

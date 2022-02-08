@@ -20,7 +20,15 @@
         // });
         // observer.observe({entryTypes: ['resource', 'mark', 'measure' , 'navigation' , 'longtask' , 'element']});
         // performance.mark('registered-observer');
-    
+        // document.addEventListener('DOMContentLoaded', function() { console.log("DOMContentLoaded after " + performance.now() + " ms"); }, false);
+        // window.addEventListener('load', function() { console.log("3 load " + performance.now() + " ms"); }, false);
+
+        window.addEventListener('load' , function () {
+            var loadTime = window.performance.timing.domContentLoadedEventEnd-window.performance.timing.unloadEventStart; 
+            let other = performance.timing.domComplete
+            console.log('Page load time is '+ loadTime , other);
+        } )
+
         function clicked(elem) {
             fetch("https://jsonplaceholder.typicode.com/todos")
                 .then(res => res.json())
