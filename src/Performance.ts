@@ -1,45 +1,79 @@
 import appContext from "./AppContext";
 import BrowserPerformanceObserver, { IBrowserPerformanceObserver } from "./BrowserPerformanceObserver";
+import { findDOMPath } from "./helper/index";
 
-interface IRaftaPerformanceMark {
+interface IRaftaPerformanceMark<T> {
     name : string;
     time : number;
+    additionalData ?: T
 }
-export type TRaftaPerformanceTimeline = IRaftaPerformanceMark[];
+export type TRaftaPerformanceTimeline<T> = IRaftaPerformanceMark<T>[];
 
-type TPaintEntryType = "first-paint" | "first-contentful-paint";
+enum PerformanceEntryName {
+    FIRST_PAINT = "first-paint" , 
+    FIRST_CONTENT_FULL_PAINT = "first-contentful-paint" , 
+    FIRST_INPUT = "first-input"
+};
+type TPaintEntryType = PerformanceEntryName.FIRST_PAINT | PerformanceEntryName.FIRST_INPUT | PerformanceEntryName.FIRST_CONTENT_FULL_PAINT;
 
-const paintShortNameClone = {
-    "first-paint" : "FP",
-    "first-contentful-paint" : "FCP",
+const performanceEntryShortName = {
+    [PerformanceEntryName.FIRST_CONTENT_FULL_PAINT] : "FCP",
+    [PerformanceEntryName.FIRST_INPUT] : "FID",
+    [PerformanceEntryName.FIRST_PAINT] : "FP",
 }
 
-class RaftaPerformance {
-    private browserPerformanceObserver : IBrowserPerformanceObserver;
-    timeline : TRaftaPerformanceTimeline;
+
+interface IFirstInteractionParament {
+    time : number;
+    target :  Node | null;
+    event : string;
+}
+
+class RaftaPerformance<T> {
+    timeline : TRaftaPerformanceTimeline<T>;
     
     constructor() {
         const { performanceTimeline } = appContext.getContext()
-        this.browserPerformanceObserver = new BrowserPerformanceObserver(this.onObservation.bind(this));
+        const browserPerformanceObserver = new BrowserPerformanceObserver(this.onObservation.bind(this));
         this.timeline = performanceTimeline;
     }
 
 
     private paintEntryMarkerHandler(paintType : TPaintEntryType , time : number) {
-        console.log('sd');
-        
         this.markToTimeline({
-            name : paintShortNameClone[paintType],
+            name : performanceEntryShortName[paintType],
             time,
-        })   
+        });
+    }
+
+    private firstInteractionDelayHandler(params : IFirstInteractionParament) {
+
+        const { time , target , event } = params;
+
+        this.markToTimeline({
+            name : performanceEntryShortName[PerformanceEntryName.FIRST_INPUT],
+            time,
+            additionalData : {
+                targetPath : target ? findDOMPath(target) : null,
+                event,
+            }
+        })
     }
 
     onObservation(entryList : PerformanceObserverEntryList) {
         entryList.getEntries().forEach(entry => {
-            // console.log(entry.name);
-            console.log(entry);
             
-            if(entry.entryType === "paint") this.paintEntryMarkerHandler((entry.name as TPaintEntryType) , entry.startTime);
+            console.log(entry);
+            const { name , startTime } = entry;
+            const entryName = <TPaintEntryType>name;
+
+            if(entry.entryType === "paint") this.paintEntryMarkerHandler(entryName , startTime);
+            if(entry.entryType === PerformanceEntryName.FIRST_INPUT) {
+                const { target , name , startTime } = (entry as PerformanceEventTiming);
+                this.firstInteractionDelayHandler({ event : name , target , time : startTime });
+            }
+
+
         })
         for (const entry of entryList.getEntriesByName('')) {
             console.log('FCP candidate:', entry.startTime, entry);
@@ -100,9 +134,9 @@ class RaftaPerformance {
     }
 
 
-    private markToTimeline(mark : IRaftaPerformanceMark) {
+    private markToTimeline(mark : IRaftaPerformanceMark<T>) {
         this.timeline.push(mark);
-        // console.log(this.timeline);
+        console.log(this.timeline);
     }
 }
 

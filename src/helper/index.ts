@@ -40,7 +40,7 @@ function detectElementIdentifier(element : HTMLElement) {
     }else return "";
 }
 
-export function findDOMPath(element : HTMLElement) : string {
+export function findDOMPath(element : HTMLElement | Node) : string {
     const pathStack = [];
     
     return (function innerRecursive(parentNode : HTMLElement) {
