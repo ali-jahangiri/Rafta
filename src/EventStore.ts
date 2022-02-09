@@ -1,10 +1,12 @@
+import appContext from "./AppContext";
 import { IRaftaEventStore, IRaftaEventDispatcherIncomeParameters } from "./interfaces/eventStoreInterface";
 
 class RaftaEventStore {
     private events : IRaftaEventStore;
     
     constructor() {
-        this.events = [];
+        const { eventTimeline } = appContext.getContext()
+        this.events = eventTimeline;
     }
 
     eventDispatcher(event : IRaftaEventDispatcherIncomeParameters) {

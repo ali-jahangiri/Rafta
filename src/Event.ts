@@ -1,6 +1,5 @@
 import RaftaEventStore from "./EventStore";
 import { debounce, findClickPos, findDOMPath, selfClearTimeout } from "./helper/index";
-import { TEventDispatcher } from "./interfaces/eventStoreInterface";
 
 class RaftaEvent {
     private readonly initialScrollEventListenerDelayForAttachment : number;
@@ -129,6 +128,15 @@ class RaftaEvent {
         })
     }
 
+
+    private visibilityChangeHandler() {
+        const visibilityState = document.visibilityState;
+        this.eventStore.eventDispatcher({
+            event : "visibilityChange",
+            data : visibilityState,
+        })
+    }
+
     private userScrollEvent() {
         selfClearTimeout(() => {
             document.addEventListener("scroll" , debounce(this.scrollHandler.bind(this) , this.scrollEventDebounce));
@@ -151,6 +159,11 @@ class RaftaEvent {
         window.addEventListener("resize" , debounce(this.resizeHandler.bind(this) , this.resizeDebounce));
     }
 
+
+    private userVisibilityEvent() {
+        document.addEventListener("visibilitychange" , this.visibilityChangeHandler.bind(this))
+    }
+
     private attachEventsListener() {
         this.userScrollEvent();
         this.userClickEvent();
@@ -158,6 +171,7 @@ class RaftaEvent {
         this.userTypeEvent();
         this.userResizeEvent();
         this.userFocusEvent();
+        this.userVisibilityEvent();
     }
 
     destroyedEventsListener() {

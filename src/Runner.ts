@@ -5,6 +5,8 @@ import RaftaPerformance from "./Performance";
 import RaftaRequest from "./Request";
 import RaftaUser from "./User";
 
+import appContext from "./AppContext";
+
 // a middleware worker for setup main Rafta class
 class RaftaRunner {
     private error : RaftaError;
@@ -29,8 +31,7 @@ class RaftaRunner {
         //         const entireUserInitialData = getEntireUserData();
         //         this.request.identifyUserRequest(entireUserInitialData);
         //     })
-        this.request.overrideBrowserFetcher();
-        
+        this.request.overrideBrowserFetcher();  
     }
 
     afterDOMLoadSetup = () => {
@@ -46,8 +47,7 @@ class RaftaRunner {
 
 
     timePeriodSetup = () => {
-        // console.log(this.eventStore.getEntire());
-        // console.log(performance.timing);
+        
     }
 }
 

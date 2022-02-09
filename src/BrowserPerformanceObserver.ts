@@ -7,7 +7,15 @@ class BrowserPerformanceObserver {
 
     constructor(onObservation: (entryList : PerformanceObserverEntryList) => void) {
         this.observer = new PerformanceObserver(onObservation);
-        this.observer.observe({entryTypes: ['resource', 'mark', 'measure' , 'paint']})
+        const OBSERVER_ENTRY_TYPE = [
+            'resource',
+            // 'measure',
+            'paint' ,
+            "event",
+            "first-input",
+        ];
+        
+        this.observer.observe({ entryTypes: OBSERVER_ENTRY_TYPE })
     }
 }
 

@@ -1,32 +1,50 @@
+import appContext from "./AppContext";
 import BrowserPerformanceObserver, { IBrowserPerformanceObserver } from "./BrowserPerformanceObserver";
 
-interface IRaftaPerformance {
+interface IRaftaPerformanceMark {
+    name : string;
+    time : number;
+}
+export type TRaftaPerformanceTimeline = IRaftaPerformanceMark[];
 
+type TPaintEntryType = "first-paint" | "first-contentful-paint";
+
+const paintShortNameClone = {
+    "first-paint" : "FP",
+    "first-contentful-paint" : "FCP",
 }
 
-
-
 class RaftaPerformance {
-    timeline : [];
     private browserPerformanceObserver : IBrowserPerformanceObserver;
-    
+    timeline : TRaftaPerformanceTimeline;
     
     constructor() {
-        this.timeline = [];
-        this.browserPerformanceObserver = new BrowserPerformanceObserver(this.onObservation);
+        const { performanceTimeline } = appContext.getContext()
+        this.browserPerformanceObserver = new BrowserPerformanceObserver(this.onObservation.bind(this));
+        this.timeline = performanceTimeline;
+    }
+
+
+    private paintEntryMarkerHandler(paintType : TPaintEntryType , time : number) {
+        console.log('sd');
+        
+        this.markToTimeline({
+            name : paintShortNameClone[paintType],
+            time,
+        })   
     }
 
     onObservation(entryList : PerformanceObserverEntryList) {
-        
-        for (const entry of entryList.getEntriesByName('first-contentful-paint')) {
+        entryList.getEntries().forEach(entry => {
+            // console.log(entry.name);
+            console.log(entry);
+            
+            if(entry.entryType === "paint") this.paintEntryMarkerHandler((entry.name as TPaintEntryType) , entry.startTime);
+        })
+        for (const entry of entryList.getEntriesByName('')) {
             console.log('FCP candidate:', entry.startTime, entry);
-        }
-        for (const entry of entryList.getEntriesByName("mark")) {
-            console.log(entry.startTime, entry);
-        }
 
-
-        
+        }
     }
 
     private windowTabVisibilityChecker(callback : (defaultVisibilityStatus : boolean) => void) {
@@ -61,19 +79,20 @@ class RaftaPerformance {
     }
 
     afterDOMLoadObservation() {
-        this.initialRecord();
+        // this.initialRecord();
+
+        this.markToTimeline({
+            name : "DOMLoad",
+            time : performance.now(),
+        })
     }
 
 
     afterLoadObservation() {
-        console.log("afterLoadObservation" , performance.now());
-        
-        
-                
-        console.log('====================================?' , performance.now());
-        var loadTime = window.performance.timing.domContentLoadedEventEnd-window.performance.timing.unloadEventStart; 
-        let other = performance.timing.domComplete
-        console.log('Page load time is '+ loadTime , other)
+        this.markToTimeline({
+            name : "fullLoad",
+            time : performance.now(),
+        })
     }
 
     setRuntimeObservation() {
@@ -81,8 +100,9 @@ class RaftaPerformance {
     }
 
 
-    private setMarker() {
-
+    private markToTimeline(mark : IRaftaPerformanceMark) {
+        this.timeline.push(mark);
+        // console.log(this.timeline);
     }
 }
 
