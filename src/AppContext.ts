@@ -1,17 +1,20 @@
 import Context from "./Context/Context";
 import { IRaftaEventStore } from "./interfaces/eventStoreInterface";
-import { TRaftaPerformanceTimeline } from "./Performance";
+import { IRaftaPerformanceTimeline } from "./Performance";
 
-interface IRaftaAppLevelContext {
+interface IRaftaAppLevelContext<T , U> {
     eventTimeline : IRaftaEventStore,
-    performanceTimeline : TRaftaPerformanceTimeline;
+    performanceTimeline : IRaftaPerformanceTimeline<T , U>;
 }
 
 const appContext = new Context<IRaftaAppLevelContext>();
 
 appContext.createContext({
     eventTimeline : [],
-    performanceTimeline : [],
+    performanceTimeline : {
+        initialResource : [],
+        initialLoadMetrics : [],
+    }
 });
 
 export default appContext;
