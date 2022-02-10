@@ -5,10 +5,6 @@ class Context<U extends Object> {
         this.contextHolder = defaultValues;
     }
 
-    createContext(defaults : U) {
-        this.contextHolder = defaults;
-    }
-
     getContext() {
         return this.contextHolder;
     }

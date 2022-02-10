@@ -2,14 +2,12 @@ import Context from "./Context/Context";
 import { IRaftaEventStore } from "./interfaces/eventStoreInterface";
 import { IRaftaPerformanceTimeline } from "./Performance";
 
-interface IRaftaAppLevelContext<T , U> {
+interface IRaftaAppLevelContext<T> {
     eventTimeline : IRaftaEventStore,
-    performanceTimeline : IRaftaPerformanceTimeline<T , U>;
+    performanceTimeline : IRaftaPerformanceTimeline<T>;
 }
 
-const appContext = new Context<IRaftaAppLevelContext>();
-
-appContext.createContext({
+const appContext = new Context({
     eventTimeline : [],
     performanceTimeline : {
         initialResource : [],

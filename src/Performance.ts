@@ -21,7 +21,7 @@ interface IFirstInteractionParament {
     event : string;
 }
 
-export interface IRaftaPerformanceTimeline<T , U> {
+export interface IRaftaPerformanceTimeline<T> {
     initialResource : IRaftaPerformanceResourceMark[],
     initialLoadMetrics : IRaftaPerformanceMetricMark<T>[]
 }
@@ -42,8 +42,8 @@ const performanceEntryShortName = {
     [PerformanceEntryName.FIRST_PAINT] : "FP",
 }
 
-class RaftaPerformance<T , U> {
-    timeline : IRaftaPerformanceTimeline<T , U>;
+class RaftaPerformance<T> {
+    timeline : IRaftaPerformanceTimeline<T>;
     private isAfterFullLoad : boolean;
     
     constructor() {
@@ -79,12 +79,14 @@ class RaftaPerformance<T , U> {
 
 
     private resourceMarkerHandler(params : IRaftaPerformanceResourceMark) {
+        this.markToTimeline({
+            ...params
+        } , "resource")
     }
 
     onObservation(entryList : PerformanceObserverEntryList) {
         entryList.getEntries().forEach(entry => {
             
-            // console.log(entry);
             const { name , startTime } = entry;
             const entryName = <TPaintEntryType>name;
 
@@ -93,8 +95,14 @@ class RaftaPerformance<T , U> {
                 const { target , name , startTime } = (entry as PerformanceEventTiming);
                 this.firstInteractionDelayHandler({ event : name , target , time : startTime });
             }else if(entry.entryType === "resource") {
-                const { transferSize , name , duration , requestStart } = (entry as PerformanceResourceTiming);
+                const { transferSize , name , duration , requestStart , startTime , initiatorType } = (entry as PerformanceResourceTiming);
 
+                this.resourceMarkerHandler({
+                    duration,
+                    path : name ,
+                    size : transferSize ,
+                    startAt : requestStart || startTime,
+                })
             }
 
 
@@ -119,22 +127,8 @@ class RaftaPerformance<T , U> {
             callback(true);
         }else window.addEventListener("visibilitychange" , onBrowserVisibilityChangeHandler , true);
     }
-    
-    private initialRecord() {
-        this.windowTabVisibilityChecker(defaultVisibilityStatus => {
-            // this.browserPerformanceObserver.observer.observe({type: 'paint', buffered: true});
-        })
-
-        // const resources = window.performance.getEntriesByType("paint");
-        // resources.forEach(resource => {
-        //     if(resource.name === "first-contentful-paint")
-        //     console.log(resource.name , resource.startTime);
-        // });
-    }
 
     afterDOMLoadObservation() {
-        // this.initialRecord();
-
         this.markToTimeline({
             name : "DOMLoad",
             time : performance.now(),
@@ -157,8 +151,8 @@ class RaftaPerformance<T , U> {
     private markToTimeline(mark : IRaftaPerformanceMetricMark<T> , pathToMarkAs : 'metric') : void;
     private markToTimeline(mark : IRaftaPerformanceResourceMark , pathToMarkAs : 'resource') : void;
     private markToTimeline(mark : IRaftaPerformanceMetricMark<T> | IRaftaPerformanceResourceMark , pathToMarkAs : TPathTOMark) {
-        if(pathToMarkAs === "metric") this.timeline.initialLoadMetrics.push(mark);
-        else if(pathToMarkAs === "resource") this.timeline.initialResource.push(mark);
+        if(pathToMarkAs === "metric") this.timeline.initialLoadMetrics.push((mark as IRaftaPerformanceMetricMark<T>));
+        else if(pathToMarkAs === "resource") this.timeline.initialResource.push(mark as IRaftaPerformanceResourceMark);
         console.log(this.timeline);
     }
 }
