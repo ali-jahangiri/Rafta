@@ -8,11 +8,7 @@ class RaftaEvent {
     private readonly resizeDebounce : number;
     private readonly mouseMoveDebounce : number;
     private readonly scrollEventDebounce : number;
-    
     private readonly shouldPreventServerConnectOnUserSleep : boolean;
-    
-
-    
     private keyboardEvent : IRaftaKeyboardEventHandler;
     
     // mouseEventDebounce : number;

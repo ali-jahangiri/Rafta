@@ -47,8 +47,7 @@ class RaftaRunner<T> {
 
 
     timePeriodSetup = () => {
-        console.log(this.eventStore);
-        
+        // console.log(this.eventStore);
     }
 }
 

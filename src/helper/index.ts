@@ -87,6 +87,7 @@ export function makeLeanKeyboardEvent(e : KeyboardEvent , wasLong : number | boo
         ...(e.altKey && { alt : true }),
         ...(e.ctrlKey && { ctrl : true }),
         ...(typeof wasLong === 'number' && { wasLong : wasLong }),
-        char : e.key,
+        ...(e.target && { target : findDOMPath((e.target as HTMLElement)) }),
+        char : e.code,
     }
 }

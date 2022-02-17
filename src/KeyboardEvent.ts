@@ -9,6 +9,7 @@ export interface IRaftaKeyboardEvent {
     ctrl ?: boolean;
     alt ?: boolean;
     wasLong ?: number;
+    target ?: string;
     char : string;
 }
 
@@ -34,7 +35,6 @@ class RaftaKeyboardEventHandler {
         this.lastPressedKey = [];
     }
 
-
     private longKeyPressTimer() {
         this.tempTimerId = setInterval(() => {
             // if user hold a key for a long , but exist form current document event holding that target key press , we should stop counting long key press timing
@@ -44,15 +44,13 @@ class RaftaKeyboardEventHandler {
         } , 100);
     }
 
-
-    checkTimerListenerAttachment() {
+    private checkTimerListenerAttachment() {
         const wasFromSameKeysType = this.lastPressedKey.every(el => el.key === this.lastPressedKey[0].key);
 
         if(!wasFromSameKeysType) {
             this.lastPressedKey = [];
         }else if(this.tempTimerId === undefined) this.longKeyPressTimer();
     }
-
 
     private dispatchLongKeyPressHandler(keyLongPressMsTime : number , keyLongPressEventObject : KeyboardEvent) {
         this.parentEventDispatcher(makeLeanKeyboardEvent(keyLongPressEventObject , keyLongPressMsTime));
@@ -80,10 +78,16 @@ class RaftaKeyboardEventHandler {
         else this.lastPressedKey?.push(e);
     }
 
+    private specificKeyUpHandler() {
+        if(this.keyPressTime) this.detectLongKeyPressHandler();
+        else {
+            this.lastPressedKey = [];
+        }
+    }
+
     private keyUpHandler(e : KeyboardEvent) {
         // old strick logic => this.lastPressedKey.length >= this.allowedTimeToDispatchLongKeyPress && this.lastPressedKey.some(el => el.key === e.key) &&
         if(this.keyPressTime) this.detectLongKeyPressHandler();
-
         else {
             this.lastPressedKey = [];
             this.dispatchKeyPressHandler(e);
@@ -91,10 +95,9 @@ class RaftaKeyboardEventHandler {
     }
 
     attachEventToWindow() {
-        // if user set "ignoreOnlySpecificsKer" to true , we can detect how much user hold a key or which functional shortcut used. 
-        // const eventBaseOnUserDecision = this.ignoreOnlySpecificsKer ? "keypress" : "keydown";
         if(this.ignoreSpecificsKey) {
-            // document.addEventListener('keypress' , this.typeHandler.bind(this));
+            window.document.addEventListener("keypress" , this.keyDownHandler.bind(this));
+            window.document.addEventListener("keyup" , this.specificKeyUpHandler.bind(this));
         }else {
             window.document.addEventListener("keydown" , this.keyDownHandler.bind(this));
             window.document.addEventListener("keyup" , this.keyUpHandler.bind(this));
