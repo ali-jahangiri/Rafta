@@ -1,4 +1,4 @@
-type TEventType = "click" | "type" | "scroll" | "mousemove" | "resize" | "focus" | "error" | "visibilityChange";
+type TEventType = "click" | "type" | "scroll" | "mousemove" | "resize" | "focus" | "error" | "visibilityChange" | "zoom";
 
 export interface IRaftaEventStoreEvent {
     event : TEventType;

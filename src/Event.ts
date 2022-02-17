@@ -2,16 +2,18 @@ import RaftaEventStore from "./EventStore";
 import { debounce, findClickPos, findDOMPath, selfClearTimeout } from "./helper/index";
 import RaftaKeyboardEventHandler, { IRaftaKeyboardEvent, IRaftaKeyboardEventHandler } from "./KeyboardEvent";
 import RaftaMouseMoveEventHandler, { IRaftaMouseMoveEventHandler } from "./MouseMoveEvent";
+import RaftaResizeEventHandler, { IRaftaResizeEventHandler } from "./ResizeEvent";
 
 class RaftaEvent {
     private readonly initialScrollEventListenerDelayForAttachment : number;
     private focusObserverId : NodeJS.Timer | undefined;
-    private readonly resizeDebounce : number;
     private readonly scrollEventDebounce : number;
     private readonly shouldPreventServerConnectOnUserSleep : boolean;
-    
+
     private keyboardEvent : IRaftaKeyboardEventHandler;
     private mouseMoveEvent : IRaftaMouseMoveEventHandler;
+    private resizeEvent : IRaftaResizeEventHandler;
+
 
     // mouseEventDebounce : number;
     // resizeEventDebounce : number;
@@ -21,16 +23,16 @@ class RaftaEvent {
 
     constructor(eventStore : RaftaEventStore) {
         this.initialScrollEventListenerDelayForAttachment = 100;
-        this.resizeDebounce = 100;
         this.scrollEventDebounce = 9;
 
         this.shouldPreventServerConnectOnUserSleep = true;
 
         this.eventStore = eventStore;
-
-
+        
         this.keyboardEvent = new RaftaKeyboardEventHandler(false , this.typeHandler.bind(this));
         this.mouseMoveEvent = new RaftaMouseMoveEventHandler(this.mouseMoveHandler.bind(this));
+        this.resizeEvent = new RaftaResizeEventHandler(this.resizeHandler.bind(this) , this.zoomHandler.bind(this));
+
     }
 
     private checkIsUserSleep() : boolean {
@@ -108,6 +110,13 @@ class RaftaEvent {
         })
     }
 
+    private zoomHandler(ratio : number) {
+        this.eventStore.eventDispatcher({
+            event : "zoom",
+            data : ratio,
+        })
+    }
+
     private resizeHandler() {
         this.eventStore.eventDispatcher({
             event : "resize",
@@ -138,10 +147,7 @@ class RaftaEvent {
         document.addEventListener("click" , this.clickHandler.bind(this));
     }
 
-    private userResizeEvent() {
-        window.addEventListener("resize" , debounce(this.resizeHandler.bind(this) , this.resizeDebounce));
-    }
-
+    
     private userVisibilityEvent() {
         document.addEventListener("visibilitychange" , this.visibilityChangeHandler.bind(this))
     }
@@ -151,7 +157,7 @@ class RaftaEvent {
         // this.userClickEvent();
         // this.mouseMoveEvent.attachEventToWindow();
         // this.keyboardEvent.attachEventToWindow();
-        // this.userResizeEvent();
+        this.resizeEvent.attachEventToWindow();
         // this.userFocusEvent();
         // this.userVisibilityEvent();
     }
