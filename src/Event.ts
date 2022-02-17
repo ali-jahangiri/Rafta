@@ -1,5 +1,6 @@
 import RaftaEventStore from "./EventStore";
 import { debounce, findClickPos, findDOMPath, selfClearTimeout } from "./helper/index";
+import RaftaKeyboardEventHandler, { IRaftaKeyboardEvent, IRaftaKeyboardEventHandler } from "./KeyboardEvent";
 
 class RaftaEvent {
     private readonly initialScrollEventListenerDelayForAttachment : number;
@@ -7,7 +8,13 @@ class RaftaEvent {
     private readonly resizeDebounce : number;
     private readonly mouseMoveDebounce : number;
     private readonly scrollEventDebounce : number;
+    
     private readonly shouldPreventServerConnectOnUserSleep : boolean;
+    
+
+    
+    private keyboardEvent : IRaftaKeyboardEventHandler;
+    
     // mouseEventDebounce : number;
     // resizeEventDebounce : number;
 
@@ -24,19 +31,8 @@ class RaftaEvent {
 
         this.eventStore = eventStore;
 
-        // var observer = new PerformanceObserver(list => {
-        //     list.getEntries().forEach(entry => {
-        //       // Display each reported measurement on console
-        //       if (console) {
-        //         console.log("Name: "       + entry.name      +
-        //                     ", Type: "     + entry.entryType +
-        //                     ", Start: "    + entry.startTime +
-        //                     ", Duration: " + entry.duration  + "\n");
-        //       }
-        //     })
-        //   });
-        // observer.observe({entryTypes: ['resource', 'mark', 'measure' , 'navigation' , 'longtask' , 'element' , 'paint']});
-        // performance.mark('registered-observer');
+
+        this.keyboardEvent = new RaftaKeyboardEventHandler(false , this.typeHandler.bind(this));
     }
 
     private checkIsUserSleep() : boolean {
@@ -89,10 +85,10 @@ class RaftaEvent {
 
     }
 
-    private typeHandler(e : KeyboardEvent) {
+    private typeHandler(e : IRaftaKeyboardEvent) {
         this.eventStore.eventDispatcher({
             event : "type",
-            data : e.key,
+            data : e,
         })
     }
 
@@ -128,7 +124,6 @@ class RaftaEvent {
         })
     }
 
-
     private visibilityChangeHandler() {
         const visibilityState = document.visibilityState;
         this.eventStore.eventDispatcher({
@@ -147,10 +142,6 @@ class RaftaEvent {
         document.addEventListener("click" , this.clickHandler.bind(this));
     }
 
-    private userTypeEvent() {
-        document.addEventListener("keydown" , this.typeHandler.bind(this));
-    }
-
     private userMouseMoveEvent() {
         document.addEventListener("mousemove" , debounce(this.mouseMoveHandler.bind(this) , this.mouseMoveDebounce));
     }
@@ -159,33 +150,31 @@ class RaftaEvent {
         window.addEventListener("resize" , debounce(this.resizeHandler.bind(this) , this.resizeDebounce));
     }
 
-
     private userVisibilityEvent() {
         document.addEventListener("visibilitychange" , this.visibilityChangeHandler.bind(this))
     }
 
     private attachEventsListener() {
-        this.userScrollEvent();
-        this.userClickEvent();
-        this.userMouseMoveEvent();
-        this.userTypeEvent();
-        this.userResizeEvent();
-        this.userFocusEvent();
-        this.userVisibilityEvent();
+        // this.userScrollEvent();
+        // this.userClickEvent();
+        // this.userMouseMoveEvent();
+        this.keyboardEvent.attachEventToWindow();
+        // this.userResizeEvent();
+        // this.userFocusEvent();
+        // this.userVisibilityEvent();
     }
 
     destroyedEventsListener() {
         // kill illuminate clear de-attach terminate
         document.removeEventListener("scroll" , this.scrollHandler);
         document.removeEventListener("click" , this.clickHandler);
-        document.removeEventListener("keydown" , this.typeHandler);
+        // document.removeEventListener("keydown" , this.typeHandler);
         document.removeEventListener("mousemove" , this.mouseMoveHandler);
         window.clearInterval(this.focusObserverId)
     }
 
     initialize() {
         this.attachEventsListener();
-
     }
 }
 

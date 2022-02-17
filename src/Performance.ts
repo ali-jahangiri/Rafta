@@ -153,7 +153,7 @@ class RaftaPerformance<T> {
     private markToTimeline(mark : IRaftaPerformanceMetricMark<T> | IRaftaPerformanceResourceMark , pathToMarkAs : TPathTOMark) {
         if(pathToMarkAs === "metric") this.timeline.initialLoadMetrics.push((mark as IRaftaPerformanceMetricMark<T>));
         else if(pathToMarkAs === "resource") this.timeline.initialResource.push(mark as IRaftaPerformanceResourceMark);
-        console.log(this.timeline);
+        // console.log(this.timeline);
     }
 }
 

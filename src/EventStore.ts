@@ -1,6 +1,10 @@
 import appContext from "./AppContext";
 import { IRaftaEventStore, IRaftaEventDispatcherIncomeParameters } from "./interfaces/eventStoreInterface";
 
+export interface IRaftaEventStoreDispatcher {
+    (event : IRaftaEventDispatcherIncomeParameters) : undefined;
+}
+
 class RaftaEventStore {
     private events : IRaftaEventStore;
     
@@ -9,7 +13,7 @@ class RaftaEventStore {
         this.events = eventTimeline;
     }
 
-    eventDispatcher(event : IRaftaEventDispatcherIncomeParameters) {
+    eventDispatcher(event : IRaftaEventDispatcherIncomeParameters) : IRaftaEventStoreDispatcher {
         const enhancedTargetEventWithTime = {
             ...event,
             time : Date.now()

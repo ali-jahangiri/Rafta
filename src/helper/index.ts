@@ -1,3 +1,5 @@
+import { IRaftaKeyboardEvent } from "../KeyboardEvent";
+
 export function clientChecker() : boolean {
     if(typeof window !== "undefined" && typeof document !== "undefined") {
         return true
@@ -76,4 +78,15 @@ export function createErrorFileName(e : ErrorEvent) {
     const lineNumber = e.lineno;
 
     return `${baseFileName}:${lineNumber}-${colNumber}`;
+}
+
+
+export function makeLeanKeyboardEvent(e : KeyboardEvent , wasLong : number | boolean) : IRaftaKeyboardEvent {
+    return {
+        ...(e.shiftKey && { shift : true }),
+        ...(e.altKey && { alt : true }),
+        ...(e.ctrlKey && { ctrl : true }),
+        ...(typeof wasLong === 'number' && { wasLong : wasLong }),
+        char : e.key,
+    }
 }

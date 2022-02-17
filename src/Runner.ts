@@ -8,11 +8,11 @@ import RaftaUser from "./User";
 import appContext from "./AppContext";
 
 // a middleware worker for setup main Rafta class
-class RaftaRunner {
+class RaftaRunner<T> {
     private error : RaftaError;
     private request : RaftaRequest;
     private event : RaftaEvent;
-    private performance : RaftaPerformance;
+    private performance : RaftaPerformance<T>;
 
     eventStore : RaftaEventStore;
 
@@ -47,6 +47,7 @@ class RaftaRunner {
 
 
     timePeriodSetup = () => {
+        console.log(this.eventStore);
         
     }
 }

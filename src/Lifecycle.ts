@@ -7,7 +7,8 @@ class RaftaLifecycle {
     private syncTimerId : number | undefined;
 
     constructor() {
-        this.syncTimeout = 3000;
+        // this.syncTimeout = 3000;
+        this.syncTimeout = 1000;
     }
 
     beforeDOMLoad(callBack : () => void) {
