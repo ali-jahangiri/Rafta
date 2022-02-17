@@ -1,16 +1,18 @@
 import RaftaEventStore from "./EventStore";
 import { debounce, findClickPos, findDOMPath, selfClearTimeout } from "./helper/index";
 import RaftaKeyboardEventHandler, { IRaftaKeyboardEvent, IRaftaKeyboardEventHandler } from "./KeyboardEvent";
+import RaftaMouseMoveEventHandler, { IRaftaMouseMoveEventHandler } from "./MouseMoveEvent";
 
 class RaftaEvent {
     private readonly initialScrollEventListenerDelayForAttachment : number;
     private focusObserverId : NodeJS.Timer | undefined;
     private readonly resizeDebounce : number;
-    private readonly mouseMoveDebounce : number;
     private readonly scrollEventDebounce : number;
     private readonly shouldPreventServerConnectOnUserSleep : boolean;
-    private keyboardEvent : IRaftaKeyboardEventHandler;
     
+    private keyboardEvent : IRaftaKeyboardEventHandler;
+    private mouseMoveEvent : IRaftaMouseMoveEventHandler;
+
     // mouseEventDebounce : number;
     // resizeEventDebounce : number;
 
@@ -20,7 +22,6 @@ class RaftaEvent {
     constructor(eventStore : RaftaEventStore) {
         this.initialScrollEventListenerDelayForAttachment = 100;
         this.resizeDebounce = 100;
-        this.mouseMoveDebounce = 8;
         this.scrollEventDebounce = 9;
 
         this.shouldPreventServerConnectOnUserSleep = true;
@@ -29,6 +30,7 @@ class RaftaEvent {
 
 
         this.keyboardEvent = new RaftaKeyboardEventHandler(false , this.typeHandler.bind(this));
+        this.mouseMoveEvent = new RaftaMouseMoveEventHandler(this.mouseMoveHandler.bind(this));
     }
 
     private checkIsUserSleep() : boolean {
@@ -36,7 +38,6 @@ class RaftaEvent {
             return false;
         }else return true;
     }
-
 
     private userFocusEvent() {
         let previousFocusStatus = true; // in default set by 'true' , because when user inter in app , the tab or window is currently active and focused
@@ -89,7 +90,6 @@ class RaftaEvent {
     }
 
     private mouseMoveHandler(e : MouseEvent) {
-        
         this.eventStore.eventDispatcher({
             event : "mousemove",
             data : {
@@ -138,10 +138,6 @@ class RaftaEvent {
         document.addEventListener("click" , this.clickHandler.bind(this));
     }
 
-    private userMouseMoveEvent() {
-        document.addEventListener("mousemove" , debounce(this.mouseMoveHandler.bind(this) , this.mouseMoveDebounce));
-    }
-
     private userResizeEvent() {
         window.addEventListener("resize" , debounce(this.resizeHandler.bind(this) , this.resizeDebounce));
     }
@@ -153,8 +149,8 @@ class RaftaEvent {
     private attachEventsListener() {
         // this.userScrollEvent();
         // this.userClickEvent();
-        // this.userMouseMoveEvent();
-        this.keyboardEvent.attachEventToWindow();
+        // this.mouseMoveEvent.attachEventToWindow();
+        // this.keyboardEvent.attachEventToWindow();
         // this.userResizeEvent();
         // this.userFocusEvent();
         // this.userVisibilityEvent();
@@ -165,8 +161,8 @@ class RaftaEvent {
         document.removeEventListener("scroll" , this.scrollHandler);
         document.removeEventListener("click" , this.clickHandler);
         // document.removeEventListener("keydown" , this.typeHandler);
-        document.removeEventListener("mousemove" , this.mouseMoveHandler);
-        window.clearInterval(this.focusObserverId)
+        // document.removeEventListener("mousemove" , this.mouseMoveHandler);
+        // window.clearInterval(this.focusObserverId)
     }
 
     initialize() {

@@ -91,3 +91,13 @@ export function makeLeanKeyboardEvent(e : KeyboardEvent , wasLong : number | boo
         char : e.code,
     }
 }
+
+
+export function axisProgressCalculator(lastSettledAxisPoint : number , safeAreaSize : number , incomingPosition : number) {
+    return (lastSettledAxisPoint + (safeAreaSize / 2)) - (incomingPosition);
+}
+
+
+export function detectAxisOutOfSafArea(calculatedAxisProgress : number , safeAreaSize : number) {
+    return calculatedAxisProgress >= safeAreaSize || calculatedAxisProgress < 0;
+}
