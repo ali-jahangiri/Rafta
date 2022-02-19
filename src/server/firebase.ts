@@ -1,15 +1,19 @@
-// // import { initializeApp } from "firebase/app";
-// import firestore from "firebase"
-// // Initialize Firebase
-// const app =  initializeApp({
-//     apiKey: "AIzaSyB90Dh6ltZvHMB3SqizNrAfuALU5WIWq3M",
-//     authDomain: "rafta-500a7.firebaseapp.com",
-//     projectId: "rafta-500a7",
-//     storageBucket: "rafta-500a7.appspot.com",
-//     messagingSenderId: "1057425763350",
-//     appId: "1:1057425763350:web:5a39d23798bb57baf3d937"
-// });
+import firebase from "firebase";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDzLzRrLZ7VnOXJe2jZcwJxiWtGODsGzBY",
+    authDomain: "fir-playgro.firebaseapp.com",
+    projectId: "fir-playgro",
+    storageBucket: "fir-playgro.appspot.com",
+    messagingSenderId: "427135388306",
+    appId: "1:427135388306:web:e2a5295bb1db445c15f44b"
+};
 
 
-// const db = firestore;
-// export { db };
+const firebaseApp = firebase.initializeApp(firebaseConfig);
+const db = firebaseApp.firestore();
+
+
+export {
+    db,
+}

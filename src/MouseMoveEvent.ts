@@ -2,6 +2,7 @@ import { axisProgressCalculator, debounce, detectAxisOutOfSafArea } from "./help
 
 export interface IRaftaMouseMoveEventHandler {
     attachEventToWindow : () => void;
+    terminateEvent : () => void;
 }
 
 interface ILastSettledPoint {
@@ -16,6 +17,7 @@ class RaftaMouseMoveEventHandler {
     private lastSettledPoint : ILastSettledPoint | undefined;
     private parentEventDispatcher : TParentEventDispatcher;
     private safeAreaSize : number;
+    private documentCallbackReference : undefined | (() => void) ;
 
     
     constructor(parentEventDispatcher : TParentEventDispatcher) {
@@ -59,7 +61,15 @@ class RaftaMouseMoveEventHandler {
 
     attachEventToWindow() {
         const debouncedCallback = debounce(this.mouseMoveHandler.bind(this) , this.mouseMoveDebounce);
+        this.documentCallbackReference = debouncedCallback;
         document.addEventListener("mousemove" , debouncedCallback);
+    }
+
+
+    terminateEvent() {
+        if(this.documentCallbackReference) {
+            document.removeEventListener("mousemove" , this.documentCallbackReference);
+        }
     }
 }
 

@@ -2,6 +2,7 @@ import { makeLeanKeyboardEvent } from "./helper/index";
 
 export interface IRaftaKeyboardEventHandler {
     attachEventToWindow : () => void;
+    terminateEvent : () => void;
 }
 
 export interface IRaftaKeyboardEvent {
@@ -102,6 +103,20 @@ class RaftaKeyboardEventHandler {
             window.document.addEventListener("keydown" , this.keyDownHandler.bind(this));
             window.document.addEventListener("keyup" , this.keyUpHandler.bind(this));
         }
+    }
+
+    terminateEvent() {
+        // console.log('should terminate');
+        
+        // if(this.ignoreSpecificsKey) {
+        //     window.document.removeEventListener("keypress" , this.keyDownHandler);
+        //     window.document.removeEventListener("keyup" , this.specificKeyUpHandler);
+        // }else {
+        //     console.log('sd');
+            
+        //     window.document.removeEventListener("keydown" , this.keyDownHandler);
+        //     window.document.removeEventListener("keyup" , this.keyUpHandler);
+        // }
     }
 }
 

@@ -1,9 +1,9 @@
 import RaftaLifecycle from "./Lifecycle";
 import RaftaRunner from "./Runner";
 
-class Rafta {
+class Rafta<T> {
     lifecycle : RaftaLifecycle;
-    runner : RaftaRunner;
+    runner : RaftaRunner<T>;
     
     constructor() {
         this.lifecycle = new RaftaLifecycle();

@@ -150,20 +150,25 @@ class RaftaEvent {
 
     private attachEventsListener() {
         this.userScrollEvent();
-        // this.userClickEvent();
-        // this.mouseMoveEvent.attachEventToWindow();
-        // this.keyboardEvent.attachEventToWindow();
-        // this.resizeEvent.attachEventToWindow();
-        // this.userFocusEvent();
-        // this.userVisibilityEvent();
+        this.userClickEvent();
+        this.mouseMoveEvent.attachEventToWindow();
+        this.keyboardEvent.attachEventToWindow();
+        this.resizeEvent.attachEventToWindow();
+        this.userFocusEvent();
+        this.userVisibilityEvent();
+
+
+        setTimeout(() => {
+            this.keyboardEvent.terminateEvent();
+        } , 5000)
     }
 
     destroyedEventsListener() {
         // kill illuminate clear de-attach terminate
-        document.removeEventListener("scroll" , this.scrollHandler);
-        document.removeEventListener("click" , this.clickHandler);
-        // document.removeEventListener("keydown" , this.typeHandler);
-        // document.removeEventListener("mousemove" , this.mouseMoveHandler);
+        // document.removeEventListener("scroll" , this.scrollHandler);
+        // document.removeEventListener("click" , this.clickHandler);
+        // this.keyboardEvent.terminateEvent();
+        // this.mouseMoveEvent.terminateEvent();
         // window.clearInterval(this.focusObserverId)
     }
 
