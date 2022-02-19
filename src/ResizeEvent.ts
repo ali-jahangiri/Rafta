@@ -19,24 +19,18 @@ class RaftaResizeEventHandler {
 
 
     private detectUserZoomLevel() {
-        let screenCssPixelRatio = ((window.outerWidth - 8) / window.innerWidth);
-        console.log(screenCssPixelRatio);
-        
-
         return Math.round((window.outerWidth / window.innerWidth) * 100)
     }
 
     private resizeHandler() {
-        const currentZoomLevel = this.detectUserZoomLevel();
-        console.log(currentZoomLevel);
+        // const currentZoomLevel = this.detectUserZoomLevel();
         
-        
-        if(currentZoomLevel !== this.initialUserZoomLevel) {
-            this.zoomEventDispatcher(currentZoomLevel);
-            // this.initialUserZoomLevel = currentZoomLevel;
-        }else {
-            this.resizeEventDispatcher();
-        }
+        // if(currentZoomLevel !== this.initialUserZoomLevel) {
+        //     this.zoomEventDispatcher(currentZoomLevel);
+        //     this.initialUserZoomLevel = currentZoomLevel;
+        // }else {
+        // }
+        this.resizeEventDispatcher();
     }
 
     attachEventToWindow() {

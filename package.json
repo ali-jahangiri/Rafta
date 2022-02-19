@@ -30,6 +30,7 @@
     "@babel/preset-env": "^7.16.7",
     "babel-loader": "^8.2.3",
     "firebase": "^9.6.1",
+    "js-cookie": "^3.0.1",
     "web-vitals": "^2.1.4"
   }
 }

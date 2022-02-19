@@ -42,6 +42,7 @@ class RaftaEvent {
     }
 
     private userFocusEvent() {
+        // user can see window , but may don't focus in current tab and tab are disable in browser
         let previousFocusStatus = true; // in default set by 'true' , because when user inter in app , the tab or window is currently active and focused
         let timer = setInterval(() => {
             const hasFocusedOnCurrentDocument = document.hasFocus();
@@ -52,19 +53,14 @@ class RaftaEvent {
         } , 1000);
 
         this.focusObserverId = timer;
-
-        // return function unsubscribeFocusEvent() {
-        //     clearInterval(timer);
-        // }
     }
 
-    private scrollHandler(e : Event) {
+    private scrollHandler() {
         const scrollPx = window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop;
-
         
         this.eventStore.eventDispatcher({
             event : "scroll",
-            data : scrollPx
+            data : Math.round(scrollPx)
         })
     }
 
@@ -147,17 +143,17 @@ class RaftaEvent {
         document.addEventListener("click" , this.clickHandler.bind(this));
     }
 
-    
     private userVisibilityEvent() {
+        // when user is not focus on page and cannot see current document
         document.addEventListener("visibilitychange" , this.visibilityChangeHandler.bind(this))
     }
 
     private attachEventsListener() {
-        // this.userScrollEvent();
+        this.userScrollEvent();
         // this.userClickEvent();
         // this.mouseMoveEvent.attachEventToWindow();
         // this.keyboardEvent.attachEventToWindow();
-        this.resizeEvent.attachEventToWindow();
+        // this.resizeEvent.attachEventToWindow();
         // this.userFocusEvent();
         // this.userVisibilityEvent();
     }
