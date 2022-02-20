@@ -101,3 +101,8 @@ export function axisProgressCalculator(lastSettledAxisPoint : number , safeAreaS
 export function detectAxisOutOfSafArea(calculatedAxisProgress : number , safeAreaSize : number) {
     return calculatedAxisProgress >= safeAreaSize || calculatedAxisProgress < 0;
 }
+
+
+export function generateId() : string {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
