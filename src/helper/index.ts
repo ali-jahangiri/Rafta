@@ -1,4 +1,5 @@
 import { IRaftaKeyboardEvent } from "../KeyboardEvent";
+import { nanoid } from "nanoid";
 
 export function clientChecker() : boolean {
     if(typeof window !== "undefined" && typeof document !== "undefined") {
@@ -107,3 +108,23 @@ export function generateId() : string {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
 
+export function generateSessionId() : string {
+    const currentTime = Date.now();
+    const id = nanoid(4);
+    return `${id.slice(0 , 2)}${currentTime}${id.slice(2)}`;
+}
+
+
+export function decodeSessionId(session : string) : number {
+    return Number(session.slice(2 , -2));
+}
+
+
+export function validateSessionSchema(session : string) : boolean {
+    const sessionTime = session.slice(2 , -2);
+    const haveValidSessionIdLength = (session.length - sessionTime.length) === 4;
+    const haveInvalidTimestamp = isNaN(Number(sessionTime));
+    
+    if(haveValidSessionIdLength && !haveInvalidTimestamp) return true;
+    else return false;  
+}

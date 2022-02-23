@@ -14,7 +14,7 @@ class Rafta<T> {
         this.lifecycle.beforeDOMLoad(() => this.runner.beforeDOMLoadSetup(packageName));
         this.lifecycle.afterDOMLoad(this.runner.afterDOMLoadSetup);
         this.lifecycle.afterFullDocumentLoad(this.runner.afterFullLoadSetup);
-        this.lifecycle.timePeriod(this.runner.timePeriodSetup);
+        this.lifecycle.callServerTimePeriod(this.runner.timePeriodSetup);
     }
 }
 

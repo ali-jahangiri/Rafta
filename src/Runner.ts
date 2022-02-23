@@ -35,6 +35,9 @@ class RaftaRunner<T> {
 
     beforeDOMLoadSetup(packageName : string) {
         this.session.createSession();
+        
+        this.eventStore.onEventDispatching(this.session.updateSession);
+
         // this.authentication.authorizeUser();
 
         // // this.request.initialPackageRequest(packageName)

@@ -31,6 +31,10 @@ class RaftaEventStore {
         return this.events.length;
     }
 
+    onEventDispatching(callback : () => void) {
+        
+    }
+
     private clearEventStore() {
         this.events = [];
     }

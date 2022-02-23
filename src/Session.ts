@@ -1,20 +1,27 @@
-import { nanoid } from "nanoid";
-import { generateId } from "./helper";
+import { decodeSessionId, generateSessionId, validateSessionSchema } from "./helper";
+
 
 const SESSION_IDENTIFIER_KEY = "userSession";
 const SESSION_EXPIRE_MINUTE_TIME = 3;
 
 
-
-type TSessionStorage = number;
+type TSessionStoredTime = number;
+type TSessionIdInLocalStorage = string | null;
 
 class RaftaSession {
-    constructor() {
+    private sessionIdInLocalStorage : TSessionIdInLocalStorage;
 
+    constructor() {
+        this.sessionIdInLocalStorage = null;
     }
 
+    private getSessionFromLocalStorage() : TSessionIdInLocalStorage {
+        const sessionId = window.localStorage.getItem(SESSION_IDENTIFIER_KEY);
+        this.sessionIdInLocalStorage = sessionId;
+        return sessionId;
+    }
 
-    private checkSessionExpiration(session : TSessionStorage) {
+    private checkIsSessionExpired(session : TSessionStoredTime) {
         const currentTime = Date.now();
         const diff = (currentTime - session) / 60000;
         
@@ -22,36 +29,52 @@ class RaftaSession {
         else return true;
     }
 
-
-    private checkIsSessionExist() : TSessionStorage | null {
-        const session = window.localStorage.getItem(SESSION_IDENTIFIER_KEY);
-        if(session) return Number(session);
+    private checkIsSessionExist() : string | null {
+        const session = this.getSessionFromLocalStorage();
+        if(session) return session;
         else return null;
     }
 
     private validateSession() {
         const session = this.checkIsSessionExist();
         if(session) {
-            const wasSessionExpired = this.checkSessionExpiration(session);
-            return wasSessionExpired ? false : true;
+            if(validateSessionSchema(session)) {
+                const decodedSessionId = decodeSessionId(session);
+                const wasSessionExpired = this.checkIsSessionExpired(decodedSessionId);
+                return wasSessionExpired ? false : true;
+            }else return false;
+
         }else return false;
     }
 
-    createSession() : TSessionStorage {
-        const haveValidSession = this.validateSession();
-        if(haveValidSession) {
-            const et = new Array(1000).fill("").map(() => nanoid(6))
-            console.log(et);
+    private checkSessionRuntimeDestructionListener() {
+        // let timer = setInterval(() => {
+        //     console.log(window.localStorage.getItem(SESSION_IDENTIFIER_KEY));
             
+        // } , 10);
+    }
+
+    createSession() : string {
+        const haveValidSession = this.validateSession();
+
+        
+        if(haveValidSession && this.sessionIdInLocalStorage) {
+            // return current existing active session
+            // this.checkSessionRuntimeDestructionListener();
+            return this.sessionIdInLocalStorage;
         }else {
             // have to create or renew session
-            const currentTime = Date.now();
-            window.localStorage.setItem(SESSION_IDENTIFIER_KEY , `${currentTime}`);
-            return currentTime;
+            const sessionId = generateSessionId();
+            window.localStorage.setItem(SESSION_IDENTIFIER_KEY , sessionId);
+            // this.checkSessionRuntimeDestructionListener();
+            return sessionId;
         }
         
     }
 
+    periodicalSessionUpdate() {
+
+    }
 
 }
 

@@ -1,9 +1,9 @@
 class RaftaLifecycle {
-    private readonly syncTimeout : number;
+    private readonly serverSyncTimeout : number;
     private syncTimerId : number | undefined;
 
     constructor() {
-        this.syncTimeout = 1000;
+        this.serverSyncTimeout = 1000;
     }
 
     beforeDOMLoad(callBack : () => void) {
@@ -18,10 +18,10 @@ class RaftaLifecycle {
         window.addEventListener('load' , callback);
     }
 
-    timePeriod(callBack : () => void) {
+    callServerTimePeriod(callBack : () => void) {
         let timer = window.setInterval(() => {
             callBack();
-        } , this.syncTimeout);
+        } , this.serverSyncTimeout);
         this.syncTimerId = timer;
     }
 
