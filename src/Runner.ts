@@ -2,25 +2,28 @@ import RaftaAuth from "./Authentication/auth";
 import RaftaError from "./Error";
 import RaftaEvent from "./Event";
 import RaftaEventStore from "./EventStore";
-import { initialize } from "./helper/requeste";
 import RaftaPerformance from "./Performance";
 import RaftaRequest from "./Request";
+import RaftaSession from "./Session";
 import RaftaUser from "./User";
 
 
-// a middleware worker for setup main Rafta class
 class RaftaRunner<T> {
     private error : RaftaError;
     private request : RaftaRequest;
     private event : RaftaEvent;
     private user : RaftaUser;
     private performance : RaftaPerformance<T>;
+    private session : RaftaSession;
 
 
     eventStore : RaftaEventStore;
     authentication : RaftaAuth;
 
     constructor() {
+        this.session = new RaftaSession();
+
+
         this.eventStore = new RaftaEventStore();
         this.request = new RaftaRequest();
         this.error = new RaftaError(this.eventStore);
@@ -28,11 +31,12 @@ class RaftaRunner<T> {
         this.performance = new RaftaPerformance();
         this.authentication = new RaftaAuth();
         this.user = new RaftaUser();
-
     }
 
     beforeDOMLoadSetup(packageName : string) {
-        this.authentication.authorizeUser();
+        this.session.createSession();
+        // this.authentication.authorizeUser();
+
         // // this.request.initialPackageRequest(packageName)
         // //     .then(() => {
         // //         const { getEntireUserData } = new RaftaUser();
@@ -40,8 +44,6 @@ class RaftaRunner<T> {
         // //         this.request.identifyUserRequest(entireUserInitialData);
         // //     })
         // this.request.overrideBrowserFetcher();
-        // console.log();
-        initialize(this.user.getEntireUserData());
     }
 
     afterDOMLoadSetup = () => {
