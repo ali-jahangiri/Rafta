@@ -108,23 +108,45 @@ export function generateId() : string {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
 
-export function generateSessionId() : string {
-    const currentTime = Date.now();
-    const id = nanoid(4);
-    return `${id.slice(0 , 2)}${currentTime}${id.slice(2)}`;
+
+
+// session helpers
+
+const COUNT_OF_SESSION_ID_PART = 8;
+const HALF_OF_SESSION_ID_PART_NUMBER = 4;
+
+export function generateSessionId(time ?: number) : string {
+    const currentTime = time || Date.now();
+    const id = nanoid(COUNT_OF_SESSION_ID_PART);
+    return `${id.slice(0 , HALF_OF_SESSION_ID_PART_NUMBER)}${currentTime}${id.slice(HALF_OF_SESSION_ID_PART_NUMBER)}`;
 }
 
 
 export function decodeSessionId(session : string) : number {
-    return Number(session.slice(2 , -2));
+    return Number(session.slice(HALF_OF_SESSION_ID_PART_NUMBER , -HALF_OF_SESSION_ID_PART_NUMBER));
 }
 
 
-export function validateSessionSchema(session : string) : boolean {
-    const sessionTime = session.slice(2 , -2);
-    const haveValidSessionIdLength = (session.length - sessionTime.length) === 4;
-    const haveInvalidTimestamp = isNaN(Number(sessionTime));
-    
-    if(haveValidSessionIdLength && !haveInvalidTimestamp) return true;
-    else return false;  
+export function validateSessionSchema(session : string | null) : boolean {
+    if(session) {
+        const sessionTime = session.slice(HALF_OF_SESSION_ID_PART_NUMBER , -HALF_OF_SESSION_ID_PART_NUMBER);
+        const haveValidSessionIdLength = (session.length - sessionTime.length) === COUNT_OF_SESSION_ID_PART;
+        const haveInvalidTimestamp = isNaN(Number(sessionTime));
+        
+        if(haveValidSessionIdLength && !haveInvalidTimestamp) return true;
+        else return false;  
+    }else return false;
+}
+
+
+export function extractIdFromSession(session : string) {
+    return `${session.slice(0 , HALF_OF_SESSION_ID_PART_NUMBER)}${session.slice(session.length - HALF_OF_SESSION_ID_PART_NUMBER)}`;
+}
+
+
+export function updateSessionTime(session : string) {
+    const currentTime = Date.now();
+    const id = extractIdFromSession(session);
+
+    return `${id.slice(0 , HALF_OF_SESSION_ID_PART_NUMBER)}${currentTime}${id.slice(HALF_OF_SESSION_ID_PART_NUMBER)}`;
 }

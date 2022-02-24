@@ -2,6 +2,7 @@ import RaftaAuth from "./Authentication/auth";
 import RaftaError from "./Error";
 import RaftaEvent from "./Event";
 import RaftaEventStore from "./EventStore";
+import { debounce } from "./helper";
 import RaftaPerformance from "./Performance";
 import RaftaRequest from "./Request";
 import RaftaSession from "./Session";
@@ -15,7 +16,6 @@ class RaftaRunner<T> {
     private user : RaftaUser;
     private performance : RaftaPerformance<T>;
     private session : RaftaSession;
-
 
     eventStore : RaftaEventStore;
     authentication : RaftaAuth;
@@ -35,8 +35,8 @@ class RaftaRunner<T> {
 
     beforeDOMLoadSetup(packageName : string) {
         this.session.createSession();
-        
-        this.eventStore.onEventDispatching(this.session.updateSession);
+        const debouncedSessionUpdateHandler = debounce(this.session.updateSession , 250);
+        this.eventStore.onEventDispatching(debouncedSessionUpdateHandler);
 
         // this.authentication.authorizeUser();
 

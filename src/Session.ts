@@ -1,8 +1,10 @@
-import { decodeSessionId, generateSessionId, validateSessionSchema } from "./helper";
+import { decodeSessionId, extractIdFromSession, generateSessionId, updateSessionTime, validateSessionSchema } from "./helper";
 
 
 const SESSION_IDENTIFIER_KEY = "userSession";
 const SESSION_EXPIRE_MINUTE_TIME = 3;
+// const SLEEP_TIME_FOR_LISTENER_ATTACHMENT = 120000;
+const SLEEP_TIME_FOR_LISTENER_ATTACHMENT = 10000;
 
 
 type TSessionStoredTime = number;
@@ -10,9 +12,14 @@ type TSessionIdInLocalStorage = string | null;
 
 class RaftaSession {
     private sessionIdInLocalStorage : TSessionIdInLocalStorage;
+    private gapTimeBetweenAutoSessionUpdate : number;
+    // private periodicalSessionUpdate : { id };
 
     constructor() {
         this.sessionIdInLocalStorage = null;
+        this.gapTimeBetweenAutoSessionUpdate = SLEEP_TIME_FOR_LISTENER_ATTACHMENT;
+
+        this.updateSession = this.updateSession.bind(this);
     }
 
     private getSessionFromLocalStorage() : TSessionIdInLocalStorage {
@@ -47,33 +54,45 @@ class RaftaSession {
         }else return false;
     }
 
-    private checkSessionRuntimeDestructionListener() {
-        // let timer = setInterval(() => {
-        //     console.log(window.localStorage.getItem(SESSION_IDENTIFIER_KEY));
-            
-        // } , 10);
+    private periodicalSessionUpdate() {
+        console.log('listener' , this.gapTimeBetweenAutoSessionUpdate);
+        
+        let timer = setTimeout(() => {
+            let intervalTimer = setInterval(() => {
+                // this.updateSession();
+                console.log('update');
+            } , 100);
+        } , this.gapTimeBetweenAutoSessionUpdate);
     }
 
     createSession() : string {
         const haveValidSession = this.validateSession();
-
+        this.periodicalSessionUpdate();
         
         if(haveValidSession && this.sessionIdInLocalStorage) {
             // return current existing active session
-            // this.checkSessionRuntimeDestructionListener();
             return this.sessionIdInLocalStorage;
         }else {
             // have to create or renew session
             const sessionId = generateSessionId();
             window.localStorage.setItem(SESSION_IDENTIFIER_KEY , sessionId);
-            // this.checkSessionRuntimeDestructionListener();
             return sessionId;
         }
-        
+
     }
 
-    periodicalSessionUpdate() {
+    private onSessionUpdate() {
+        this.gapTimeBetweenAutoSessionUpdate = SLEEP_TIME_FOR_LISTENER_ATTACHMENT;
+    }
 
+    updateSession() {
+        // check for existence of session , if session destroyed we have to create new one
+        const prevStoredSession = this.getSessionFromLocalStorage();
+        if(prevStoredSession && validateSessionSchema(prevStoredSession)) {
+            const newTimeUpdatedSession = updateSessionTime(prevStoredSession);
+            window.localStorage.setItem(SESSION_IDENTIFIER_KEY , newTimeUpdatedSession);
+        }else this.createSession();
+        this.onSessionUpdate();
     }
 
 }

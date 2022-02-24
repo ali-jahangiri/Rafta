@@ -7,18 +7,22 @@ export interface IRaftaEventStoreDispatcher {
 
 class RaftaEventStore {
     private events : IRaftaEventStore;
+    private onEventDispatchCallback : () => void;
     
     constructor() {
         const { eventTimeline } = appContext.getContext()
         this.events = eventTimeline;
+
+        this.onEventDispatchCallback = () => {};
     }
 
-    eventDispatcher(event : IRaftaEventDispatcherIncomeParameters) : IRaftaEventStoreDispatcher {
+    eventDispatcher(event : IRaftaEventDispatcherIncomeParameters) : void {
         const enhancedTargetEventWithTime = {
             ...event,
             time : Date.now()
         }
         this.events.push(enhancedTargetEventWithTime);
+        this.onEventDispatchCallback();
     }
 
     getEntire() {
@@ -32,7 +36,7 @@ class RaftaEventStore {
     }
 
     onEventDispatching(callback : () => void) {
-        
+        this.onEventDispatchCallback = callback;
     }
 
     private clearEventStore() {
