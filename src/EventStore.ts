@@ -10,9 +10,7 @@ class RaftaEventStore {
     private onEventDispatchCallback : () => void;
     
     constructor() {
-        const { eventTimeline } = appContext.getContext()
-        this.events = eventTimeline;
-
+        this.events = appContext.getContext().eventTimeline;
         this.onEventDispatchCallback = () => {};
     }
 

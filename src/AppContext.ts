@@ -5,7 +5,8 @@ const appContext = new Context({
     performanceTimeline : {
         initialResource : [],
         initialLoadMetrics : [],
-    }
+    },
+    sessionId : "",
 });
 
 export default appContext;

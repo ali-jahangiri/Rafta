@@ -1,8 +1,9 @@
+import appContext from "./AppContext";
 import RaftaAuth from "./Authentication/auth";
 import RaftaError from "./Error";
 import RaftaEvent from "./Event";
 import RaftaEventStore from "./EventStore";
-import { debounce } from "./helper";
+import { debounce, sessionInContext } from "./helper";
 import RaftaPerformance from "./Performance";
 import RaftaRequest from "./Request";
 import RaftaSession from "./Session";
@@ -23,7 +24,6 @@ class RaftaRunner<T> {
     constructor() {
         this.session = new RaftaSession();
 
-
         this.eventStore = new RaftaEventStore();
         this.request = new RaftaRequest();
         this.error = new RaftaError(this.eventStore);
@@ -34,7 +34,11 @@ class RaftaRunner<T> {
     }
 
     beforeDOMLoadSetup(packageName : string) {
-        this.session.createSession();
+        const { set : setSessionInContext } = sessionInContext();
+
+        setSessionInContext(this.session.createSession());
+        this.session.periodicalSessionUpdate(setSessionInContext);
+        
         const debouncedSessionUpdateHandler = debounce(this.session.updateSession , 250);
         this.eventStore.onEventDispatching(debouncedSessionUpdateHandler);
 
@@ -62,6 +66,8 @@ class RaftaRunner<T> {
 
 
     timePeriodSetup = () => {
+        console.log(appContext.getContext());
+        
         // console.log(this.eventStore.getEntire());
     }
 }

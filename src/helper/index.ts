@@ -1,5 +1,6 @@
 import { IRaftaKeyboardEvent } from "../KeyboardEvent";
 import { nanoid } from "nanoid";
+import appContext from "../AppContext";
 
 export function clientChecker() : boolean {
     if(typeof window !== "undefined" && typeof document !== "undefined") {
@@ -111,9 +112,8 @@ export function generateId() : string {
 
 
 // session helpers
-
 const COUNT_OF_SESSION_ID_PART = 8;
-const HALF_OF_SESSION_ID_PART_NUMBER = 4;
+const HALF_OF_SESSION_ID_PART_NUMBER = COUNT_OF_SESSION_ID_PART / 2;
 
 export function generateSessionId(time ?: number) : string {
     const currentTime = time || Date.now();
@@ -149,4 +149,15 @@ export function updateSessionTime(session : string) {
     const id = extractIdFromSession(session);
 
     return `${id.slice(0 , HALF_OF_SESSION_ID_PART_NUMBER)}${currentTime}${id.slice(HALF_OF_SESSION_ID_PART_NUMBER)}`;
+}
+
+export function sessionInContext() {
+    return {
+        set(session : string) {
+            appContext.getContext().sessionId = session;
+        },
+        get() {
+            return appContext.getContext().sessionId;
+        }
+    }
 }

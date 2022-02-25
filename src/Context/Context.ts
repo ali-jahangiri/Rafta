@@ -1,4 +1,4 @@
-class Context<U extends Object> {
+class Context<U extends {}> {
     private contextHolder : U;
 
     constructor(defaultValues : U) {
