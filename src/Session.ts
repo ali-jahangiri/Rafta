@@ -1,4 +1,4 @@
-import { decodeSessionId, extractIdFromSession, generateSessionId, updateSessionTime, validateSessionSchema } from "./helper";
+import { extractTimeFromSession, extractIdFromSession, generateSessionId, updateSessionTime, validateSessionSchema } from "./helper";
 
 
 const SESSION_IDENTIFIER_KEY = "userSession";
@@ -45,7 +45,7 @@ class RaftaSession {
         const session = this.checkIsSessionExist();
         if(session) {
             if(validateSessionSchema(session)) {
-                const decodedSessionId = decodeSessionId(session);
+                const decodedSessionId = extractTimeFromSession(session);
                 const wasSessionExpired = this.checkIsSessionExpired(decodedSessionId);
                 return wasSessionExpired ? false : true;
             }else return false;

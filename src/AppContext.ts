@@ -1,7 +1,8 @@
 import Context from "./Context/Context";
+import { generateEmptyEventStoreList } from "./helper";
 
 const appContext = new Context({
-    eventTimeline : [],
+    eventTimeline : generateEmptyEventStoreList(),
     performanceTimeline : {
         initialResource : [],
         initialLoadMetrics : [],

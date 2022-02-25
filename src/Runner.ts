@@ -38,7 +38,7 @@ class RaftaRunner<T> {
 
         setSessionInContext(this.session.createSession());
         this.session.periodicalSessionUpdate(setSessionInContext);
-        
+
         const debouncedSessionUpdateHandler = debounce(this.session.updateSession , 250);
         this.eventStore.onEventDispatching(debouncedSessionUpdateHandler);
 
@@ -66,9 +66,8 @@ class RaftaRunner<T> {
 
 
     timePeriodSetup = () => {
-        console.log(appContext.getContext());
-        
-        // console.log(this.eventStore.getEntire());
+        // console.log();this.eventStore.getEntire()
+        console.log(this.eventStore.getEntire());
     }
 }
 

@@ -1,12 +1,26 @@
 import appContext from "./AppContext";
-import { IRaftaEventStore, IRaftaEventDispatcherIncomeParameters } from "./interfaces/eventStoreInterface";
+import { generateEmptyEventStoreList, clearEmptyEventsList } from "./helper";
+import { IRaftaEventDispatcherIncomeParameters, TEventStore, TEventListKey, TEventType } from "./interfaces/eventStoreInterface";
 
 export interface IRaftaEventStoreDispatcher {
     (event : IRaftaEventDispatcherIncomeParameters) : undefined;
 }
 
+
+const EVENTS_GROUPING_NAME : {[key in TEventType] : TEventListKey} = {
+    click : 'clicks',
+    type : 'types',
+    scroll : 'scrolls',
+    mouseMove : 'mouseMoves',
+    resize : 'resizes',
+    focus : 'focuses',
+    error : 'errors',
+    visibilityChange : 'visibilityChanges',
+    zoom : 'zooms',
+}
+
 class RaftaEventStore {
-    private events : IRaftaEventStore;
+    private events : TEventStore;
     private onEventDispatchCallback : () => void;
     
     constructor() {
@@ -19,18 +33,18 @@ class RaftaEventStore {
             ...event,
             time : Date.now()
         }
-        this.events.push(enhancedTargetEventWithTime);
+        this.events[EVENTS_GROUPING_NAME[enhancedTargetEventWithTime.event]].push(enhancedTargetEventWithTime);
         this.onEventDispatchCallback();
     }
 
     getEntire() {
-        const entireStoreCloned = [...this.events];
+        const entireStoreCloned = { ...this.events };
         this.clearEventStore();
-        return entireStoreCloned;
+        return clearEmptyEventsList(entireStoreCloned);
     }
 
     getEventsLength() {
-        return this.events.length;
+        
     }
 
     onEventDispatching(callback : () => void) {
@@ -38,7 +52,7 @@ class RaftaEventStore {
     }
 
     private clearEventStore() {
-        this.events = [];
+        this.events = generateEmptyEventStoreList();
     }
 }
 

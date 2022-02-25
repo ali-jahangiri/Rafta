@@ -1,5 +1,6 @@
 import RaftaEventStore from "./EventStore";
 import { debounce, findClickPos, findDOMPath, selfClearTimeout } from "./helper/index";
+import { EventsKeyName } from "./interfaces/eventStoreInterface";
 import RaftaKeyboardEventHandler, { IRaftaKeyboardEvent, IRaftaKeyboardEventHandler } from "./KeyboardEvent";
 import RaftaMouseMoveEventHandler, { IRaftaMouseMoveEventHandler } from "./MouseMoveEvent";
 import RaftaResizeEventHandler, { IRaftaResizeEventHandler } from "./ResizeEvent";
@@ -59,7 +60,7 @@ class RaftaEvent {
         const scrollPx = window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop;
         
         this.eventStore.eventDispatcher({
-            event : "scroll",
+            event : EventsKeyName.SCROLL,
             data : Math.round(scrollPx)
         })
     }
@@ -71,7 +72,7 @@ class RaftaEvent {
         const selectedElementPosition = findClickPos(e);
 
         this.eventStore.eventDispatcher({
-            event : "click",
+            event : EventsKeyName.CLICK,
             data : {
                 path : selectedElementPath,
                 position : selectedElementPosition,
@@ -82,14 +83,14 @@ class RaftaEvent {
 
     private typeHandler(e : IRaftaKeyboardEvent) {
         this.eventStore.eventDispatcher({
-            event : "type",
+            event : EventsKeyName.TYPE,
             data : e,
         })
     }
 
     private mouseMoveHandler(e : MouseEvent) {
         this.eventStore.eventDispatcher({
-            event : "mousemove",
+            event : EventsKeyName.MOUSEMOVE,
             data : {
                 position : {
                     x : e.clientX,
@@ -101,21 +102,21 @@ class RaftaEvent {
 
     private focusHandler(isFocused : boolean) {
         this.eventStore.eventDispatcher({
-            event : "focus",
+            event : EventsKeyName.FOCUS,
             data : isFocused,
         })
     }
 
     private zoomHandler(ratio : number) {
         this.eventStore.eventDispatcher({
-            event : "zoom",
+            event : EventsKeyName.ZOOM,
             data : ratio,
         })
     }
 
     private resizeHandler() {
         this.eventStore.eventDispatcher({
-            event : "resize",
+            event : EventsKeyName.RESIZE,
             data : {
                 viewport : {
                     height : window.innerHeight,
@@ -128,7 +129,7 @@ class RaftaEvent {
     private visibilityChangeHandler() {
         const visibilityState = document.visibilityState;
         this.eventStore.eventDispatcher({
-            event : "visibilityChange",
+            event : EventsKeyName.VISIBILITY_CHANGE,
             data : visibilityState,
         })
     }

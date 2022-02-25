@@ -1,13 +1,7 @@
-import { IRaftaKeyboardEvent } from "../KeyboardEvent";
 import { nanoid } from "nanoid";
+import { IRaftaKeyboardEvent } from "../KeyboardEvent";
 import appContext from "../AppContext";
-
-export function clientChecker() : boolean {
-    if(typeof window !== "undefined" && typeof document !== "undefined") {
-        return true
-    }else return false;
-}
-
+import { TEventStore, TEventListKey, TPossibleEmptyEventStore } from "../interfaces/eventStoreInterface";
 
 export const debounce = (func: Function , wait : number) => {
     let timeoutId : number | null | undefined;
@@ -21,7 +15,6 @@ export const debounce = (func: Function , wait : number) => {
     };
 };
 
-
 export function selfClearTimeout(callback : Function , timeout : number) {
     let timer = window.setTimeout(() => {
         callback();
@@ -29,11 +22,15 @@ export function selfClearTimeout(callback : Function , timeout : number) {
     } , timeout);
 }
 
-
 export function deepClone(object : Object) {
     return JSON.parse(JSON.stringify(object));
 }
 
+export function clientChecker() : boolean {
+    if(typeof window !== "undefined" && typeof document !== "undefined") {
+        return true
+    }else return false;
+}
 
 function detectElementIdentifier(element : HTMLElement) {
     if(element.id) {
@@ -58,9 +55,8 @@ export function findDOMPath(element : HTMLElement | Node) : string {
             innerRecursive(parentNode.parentElement);
         }
         return pathStack;
-    })(element).reverse().join(" ");
+    })(element as HTMLElement).reverse().join(" ");
 }
-
 
 export function findClickPos(e : MouseEvent) : { x : number; y : number } {
     const x = e.clientX;
@@ -72,8 +68,6 @@ export function findClickPos(e : MouseEvent) : { x : number; y : number } {
     }
 }
 
-
-
 export function createErrorFileName(e : ErrorEvent) {
     const baseFileName = e.filename;
     const colNumber = e.colno;
@@ -81,7 +75,6 @@ export function createErrorFileName(e : ErrorEvent) {
 
     return `${baseFileName}:${lineNumber}-${colNumber}`;
 }
-
 
 export function makeLeanKeyboardEvent(e : KeyboardEvent , wasLong : number | boolean) : IRaftaKeyboardEvent {
     return {
@@ -94,21 +87,13 @@ export function makeLeanKeyboardEvent(e : KeyboardEvent , wasLong : number | boo
     }
 }
 
-
 export function axisProgressCalculator(lastSettledAxisPoint : number , safeAreaSize : number , incomingPosition : number) {
     return (lastSettledAxisPoint + (safeAreaSize / 2)) - (incomingPosition);
 }
 
-
 export function detectAxisOutOfSafArea(calculatedAxisProgress : number , safeAreaSize : number) {
     return calculatedAxisProgress >= safeAreaSize || calculatedAxisProgress < 0;
 }
-
-
-export function generateId() : string {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
-}
-
 
 
 // session helpers
@@ -121,11 +106,13 @@ export function generateSessionId(time ?: number) : string {
     return `${id.slice(0 , HALF_OF_SESSION_ID_PART_NUMBER)}${currentTime}${id.slice(HALF_OF_SESSION_ID_PART_NUMBER)}`;
 }
 
-
-export function decodeSessionId(session : string) : number {
+export function extractTimeFromSession(session : string) : number {
     return Number(session.slice(HALF_OF_SESSION_ID_PART_NUMBER , -HALF_OF_SESSION_ID_PART_NUMBER));
 }
 
+export function extractIdFromSession(session : string) {
+    return `${session.slice(0 , HALF_OF_SESSION_ID_PART_NUMBER)}${session.slice(session.length - HALF_OF_SESSION_ID_PART_NUMBER)}`;
+}
 
 export function validateSessionSchema(session : string | null) : boolean {
     if(session) {
@@ -137,12 +124,6 @@ export function validateSessionSchema(session : string | null) : boolean {
         else return false;  
     }else return false;
 }
-
-
-export function extractIdFromSession(session : string) {
-    return `${session.slice(0 , HALF_OF_SESSION_ID_PART_NUMBER)}${session.slice(session.length - HALF_OF_SESSION_ID_PART_NUMBER)}`;
-}
-
 
 export function updateSessionTime(session : string) {
     const currentTime = Date.now();
@@ -160,4 +141,27 @@ export function sessionInContext() {
             return appContext.getContext().sessionId;
         }
     }
+}
+
+
+export function generateEmptyEventStoreList() : TEventStore {
+    return {
+        clicks : [],
+        types : [],
+        scrolls : [],
+        mouseMoves : [],
+        resizes : [],
+        focuses : [],
+        errors : [],
+        visibilityChanges : [],
+        zooms : [],
+    }
+}
+
+export function clearEmptyEventsList(eventStore : TEventStore) {
+    const newBaseObject : TPossibleEmptyEventStore = {};
+    Object.entries(eventStore)
+        .filter(([_ , value]) => value.length)
+        .map(([key , value]) => newBaseObject[(key as TEventListKey)] = value);
+    return newBaseObject;
 }
