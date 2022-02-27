@@ -1,33 +1,35 @@
+import RaftaClickEventHandler, { IRaftaClickHandler } from "./ClickEvent";
 import RaftaEventStore from "./EventStore";
-import { debounce, findClickPos, findDOMPath, selfClearTimeout } from "./helper/index";
+import { findClickPos, findDOMPath } from "./helper/index";
 import { EventsKeyName } from "./interfaces/eventStoreInterface";
 import RaftaKeyboardEventHandler, { IRaftaKeyboardEvent, IRaftaKeyboardEventHandler } from "./KeyboardEvent";
 import RaftaMouseMoveEventHandler, { IRaftaMouseMoveEventHandler } from "./MouseMoveEvent";
+import RaftaUserVisibilityChangeEventHandler, { IRaftaUserVisibilityChangeHandler } from "./RaftaUserVisibilityChangeEvent";
 import RaftaResizeEventHandler, { IRaftaResizeEventHandler } from "./ResizeEvent";
+import RaftaScrollEventHandler, { IRaftaScrollHandler } from "./ScrollEvent";
+
+
+// TODO
+// mouseEventDebounce : number;
+// resizeEventDebounce : number;
+
 
 class RaftaEvent {
-    private readonly initialScrollEventListenerDelayForAttachment : number;
     private focusObserverId : NodeJS.Timer | undefined;
-    private readonly scrollEventDebounce : number;
+    
     private readonly shouldPreventServerConnectOnUserSleep : boolean;
 
     private keyboardEvent : IRaftaKeyboardEventHandler;
     private mouseMoveEvent : IRaftaMouseMoveEventHandler;
     private resizeEvent : IRaftaResizeEventHandler;
-
-
-    // mouseEventDebounce : number;
-    // resizeEventDebounce : number;
+    private clickEvent : IRaftaClickHandler;
+    private scrollEvent : IRaftaScrollHandler;
+    private visibilityChange : IRaftaUserVisibilityChangeHandler;
 
     private eventStore : RaftaEventStore;
 
-
     constructor(eventStore : RaftaEventStore) {
-        this.initialScrollEventListenerDelayForAttachment = 100;
         
-        // (for detection hard scroll with factor of time & scroll px in near that rise for 2 time in near distance ) scrollEventDebounce = 18;
-        this.scrollEventDebounce = 20;
-
         this.shouldPreventServerConnectOnUserSleep = true;
 
         this.eventStore = eventStore;
@@ -35,7 +37,9 @@ class RaftaEvent {
         this.keyboardEvent = new RaftaKeyboardEventHandler(false , this.typeHandler.bind(this));
         this.mouseMoveEvent = new RaftaMouseMoveEventHandler(this.mouseMoveHandler.bind(this));
         this.resizeEvent = new RaftaResizeEventHandler(this.resizeHandler.bind(this) , this.zoomHandler.bind(this));
-
+        this.clickEvent = new RaftaClickEventHandler(this.clickHandler.bind(this));
+        this.scrollEvent = new RaftaScrollEventHandler(this.scrollHandler.bind(this));
+        this.visibilityChange = new RaftaUserVisibilityChangeEventHandler(this.visibilityChangeHandler.bind(this));
     }
 
     private checkIsUserSleep() : boolean {
@@ -136,40 +140,24 @@ class RaftaEvent {
         })
     }
 
-    private userScrollEvent() {
-
-        const debouncedScrollHandler = debounce(this.scrollHandler.bind(this) , this.scrollEventDebounce);
-        selfClearTimeout(() => {
-            document.addEventListener("scroll" , debouncedScrollHandler);
-        } , this.initialScrollEventListenerDelayForAttachment);
-    }
-
-    private userClickEvent() {
-        
-    }
-
-    private userVisibilityEvent() {
-        // when user is not focus on page and cannot see current document
-        document.addEventListener("visibilitychange" , this.visibilityChangeHandler.bind(this))
-    }
-
     private attachEventsListener() {
-        this.userScrollEvent();
-        this.userClickEvent();
+        this.scrollEvent.attachEventToWindow();
+        this.clickEvent.attachEventToWindow();
         this.mouseMoveEvent.attachEventToWindow();
         this.keyboardEvent.attachEventToWindow();
         this.resizeEvent.attachEventToWindow();
+        this.visibilityChange.attachEventToWindow();
         this.userFocusEvent();
-        this.userVisibilityEvent();
     }
 
     terminateEventsListeners() {
         // kill illuminate clear de-attach terminate
 
-        document.removeEventListener("scroll" , this.scrollHandler);
-        // document.removeEventListener("click" , this.clickHandler);
+        this.scrollEvent.terminateEvent();
         this.keyboardEvent.terminateEvent();
         this.mouseMoveEvent.terminateEvent();
+        this.clickEvent.terminateEvent();
+        this.visibilityChange.terminateEvent();
         // window.clearInterval(this.focusObserverId)
     }
 
