@@ -34,14 +34,17 @@ class RaftaRunner<T> {
     }
 
     beforeDOMLoadSetup(packageName : string) {
-        const { set : setSessionInContext } = sessionInContext();
+        const { set : setSessionInContext , get } = sessionInContext();
 
         setSessionInContext(this.session.createSession());
         this.session.periodicalSessionUpdate(setSessionInContext);
 
         const debouncedSessionUpdateHandler = debounce(this.session.updateSession , 250);
         this.eventStore.onEventDispatching(debouncedSessionUpdateHandler);
-
+        
+        
+        console.log(get());
+        
         // this.authentication.authorizeUser();
 
         // // this.request.initialPackageRequest(packageName)

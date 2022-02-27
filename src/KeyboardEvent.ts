@@ -14,7 +14,19 @@ export interface IRaftaKeyboardEvent {
     char : string;
 }
 
+interface ICallbacksReference {
+    keypress : (e : KeyboardEvent) => void;
+    keyUp : (e : KeyboardEvent) => void;
+    keyDown : (e : KeyboardEvent) => void;
+}
+
 type TParentEventDispatcher = (e : IRaftaKeyboardEvent) => void;
+
+enum KeyboardEventKeyString {
+    KEYPRESS = "keypress" ,
+    KEYUP = "keyup",
+    KEYDOWN = "keydown",
+};
 
 
 class RaftaKeyboardEventHandler {
@@ -25,6 +37,8 @@ class RaftaKeyboardEventHandler {
     private lastPressedKey : KeyboardEvent[];
     private tempTimerId : NodeJS.Timer | undefined;
 
+    private callbacksReference : ICallbacksReference;
+
 
     constructor(ignoreOnlySpecificsKer : boolean , parentEventDispatcher : TParentEventDispatcher ) {
         this.allowedTimeToDispatchLongKeyPress = 3;
@@ -34,7 +48,14 @@ class RaftaKeyboardEventHandler {
         this.parentEventDispatcher = parentEventDispatcher;
 
         this.lastPressedKey = [];
+
+        this.callbacksReference = {
+            keypress : () => {} ,
+            keyUp : () => {} ,
+            keyDown : () => {} ,
+        }
     }
+    
 
     private longKeyPressTimer() {
         this.tempTimerId = setInterval(() => {
@@ -97,26 +118,24 @@ class RaftaKeyboardEventHandler {
 
     attachEventToWindow() {
         if(this.ignoreSpecificsKey) {
-            window.document.addEventListener("keypress" , this.keyDownHandler.bind(this));
-            window.document.addEventListener("keyup" , this.specificKeyUpHandler.bind(this));
+            this.callbacksReference.keypress = this.keyDownHandler.bind(this);
+            window.document.addEventListener(KeyboardEventKeyString.KEYPRESS , this.callbacksReference.keypress);
         }else {
-            window.document.addEventListener("keydown" , this.keyDownHandler.bind(this));
-            window.document.addEventListener("keyup" , this.keyUpHandler.bind(this));
+            this.callbacksReference.keyDown = this.keyDownHandler.bind(this);
+            window.document.addEventListener(KeyboardEventKeyString.KEYDOWN , this.callbacksReference.keyDown);
         }
+
+        this.callbacksReference.keyUp = this.ignoreSpecificsKey 
+                                        ? this.specificKeyUpHandler.bind(this) 
+                                        : this.keyUpHandler.bind(this);
+
+        window.document.addEventListener(KeyboardEventKeyString.KEYUP , this.callbacksReference.keyUp);
     }
 
     terminateEvent() {
-        // console.log('should terminate');
-        
-        // if(this.ignoreSpecificsKey) {
-        //     window.document.removeEventListener("keypress" , this.keyDownHandler);
-        //     window.document.removeEventListener("keyup" , this.specificKeyUpHandler);
-        // }else {
-        //     console.log('sd');
-            
-        //     window.document.removeEventListener("keydown" , this.keyDownHandler);
-        //     window.document.removeEventListener("keyup" , this.keyUpHandler);
-        // }
+        if(this.ignoreSpecificsKey) window.document.removeEventListener(KeyboardEventKeyString.KEYPRESS , this.callbacksReference.keypress);
+        else window.document.removeEventListener(KeyboardEventKeyString.KEYDOWN , this.callbacksReference.keyDown);
+        window.document.removeEventListener(KeyboardEventKeyString.KEYUP , this.callbacksReference.keyUp);
     }
 }
 

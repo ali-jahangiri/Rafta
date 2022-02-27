@@ -61,13 +61,10 @@ class RaftaEvent {
     private scrollHandler() {
         const scrollPx = window?.pageYOffset || (document?.documentElement || document?.body?.parentNode || document?.body)?.scrollTop;
         
-        console.log(scrollPx);
-        
-
-        // this.eventStore.eventDispatcher({
-        //     event : EventsKeyName.SCROLL,
-        //     data : Math.round(scrollPx)
-        // })
+        this.eventStore.eventDispatcher({
+            event : EventsKeyName.SCROLL,
+            data : Math.round(scrollPx)
+        })
     }
 
     private clickHandler(e : MouseEvent) {
@@ -140,13 +137,15 @@ class RaftaEvent {
     }
 
     private userScrollEvent() {
+
+        const debouncedScrollHandler = debounce(this.scrollHandler.bind(this) , this.scrollEventDebounce);
         selfClearTimeout(() => {
-            document.addEventListener("scroll" , debounce(this.scrollHandler.bind(this) , this.scrollEventDebounce));
+            document.addEventListener("scroll" , debouncedScrollHandler);
         } , this.initialScrollEventListenerDelayForAttachment);
     }
 
     private userClickEvent() {
-        document.addEventListener("click" , this.clickHandler.bind(this));
+        
     }
 
     private userVisibilityEvent() {
@@ -162,19 +161,15 @@ class RaftaEvent {
         this.resizeEvent.attachEventToWindow();
         this.userFocusEvent();
         this.userVisibilityEvent();
-
-
-        setTimeout(() => {
-            this.keyboardEvent.terminateEvent();
-        } , 5000)
     }
 
-    destroyedEventsListener() {
+    terminateEventsListeners() {
         // kill illuminate clear de-attach terminate
-        // document.removeEventListener("scroll" , this.scrollHandler);
+
+        document.removeEventListener("scroll" , this.scrollHandler);
         // document.removeEventListener("click" , this.clickHandler);
-        // this.keyboardEvent.terminateEvent();
-        // this.mouseMoveEvent.terminateEvent();
+        this.keyboardEvent.terminateEvent();
+        this.mouseMoveEvent.terminateEvent();
         // window.clearInterval(this.focusObserverId)
     }
 

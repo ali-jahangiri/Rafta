@@ -17,13 +17,15 @@ class RaftaMouseMoveEventHandler {
     private lastSettledPoint : ILastSettledPoint | undefined;
     private parentEventDispatcher : TParentEventDispatcher;
     private safeAreaSize : number;
-    private documentCallbackReference : undefined | (() => void) ;
+    private callbackReference : () => void ;
 
     
     constructor(parentEventDispatcher : TParentEventDispatcher) {
         this.mouseMoveDebounce = 15;
         this.safeAreaSize = 50;
         this.parentEventDispatcher = parentEventDispatcher;
+
+        this.callbackReference = () => {};
     }
 
     private attachPointHandler(currentPosition : ILastSettledPoint , e : MouseEvent) {
@@ -60,16 +62,13 @@ class RaftaMouseMoveEventHandler {
     }
 
     attachEventToWindow() {
-        const debouncedCallback = debounce(this.mouseMoveHandler.bind(this) , this.mouseMoveDebounce);
-        this.documentCallbackReference = debouncedCallback;
-        document.addEventListener("mousemove" , debouncedCallback);
+        this.callbackReference = debounce(this.mouseMoveHandler.bind(this) , this.mouseMoveDebounce);
+        document.addEventListener("mousemove" , this.callbackReference);
     }
 
 
     terminateEvent() {
-        if(this.documentCallbackReference) {
-            document.removeEventListener("mousemove" , this.documentCallbackReference);
-        }
+        document.removeEventListener("mousemove" , this.callbackReference);
     }
 }
 
