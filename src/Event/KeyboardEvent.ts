@@ -1,9 +1,4 @@
-import { makeLeanKeyboardEvent } from "./helper/index";
-
-export interface IRaftaKeyboardEventHandler {
-    attachEventToWindow : () => void;
-    terminateEvent : () => void;
-}
+import { makeLeanKeyboardEvent } from "../helper/index";
 
 export interface IRaftaKeyboardEvent {
     shift ?: boolean;

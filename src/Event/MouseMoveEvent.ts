@@ -1,9 +1,4 @@
-import { axisProgressCalculator, debounce, detectAxisOutOfSafArea } from "./helper/index";
-
-export interface IRaftaMouseMoveEventHandler {
-    attachEventToWindow : () => void;
-    terminateEvent : () => void;
-}
+import { axisProgressCalculator, debounce, detectAxisOutOfSafArea } from "../helper/index";
 
 interface ILastSettledPoint {
     x : number;

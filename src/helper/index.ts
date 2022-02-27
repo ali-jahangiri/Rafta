@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { IRaftaKeyboardEvent } from "../KeyboardEvent";
+import { IRaftaKeyboardEvent } from "../Event/KeyboardEvent";
 import appContext from "../AppContext";
 import { TEventStore, TEventListKey, TPossibleEmptyEventStore } from "../interfaces/eventStoreInterface";
 

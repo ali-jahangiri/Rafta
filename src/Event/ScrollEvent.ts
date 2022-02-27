@@ -1,10 +1,4 @@
-import { debounce, selfClearTimeout } from "./helper";
-
-export interface IRaftaScrollHandler {
-    attachEventToWindow : () => void;
-    terminateEvent : () => void;
-}
-
+import { debounce, selfClearTimeout } from "../helper";
 
 class RaftaScrollEventHandler {
     private parentEventDispatcher : () => void;

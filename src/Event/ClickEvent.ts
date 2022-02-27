@@ -1,11 +1,5 @@
 type TParentEventDispatcher = (e : MouseEvent) => void;
 
-export interface IRaftaClickHandler {
-    attachEventToWindow : () => void;
-    terminateEvent : () => void;
-}
-
-
 class RaftaClickEventHandler {
     private callbackReference : TParentEventDispatcher;
     private parentEventDispatcher : TParentEventDispatcher

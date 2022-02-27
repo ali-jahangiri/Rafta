@@ -1,30 +1,28 @@
-import RaftaClickEventHandler, { IRaftaClickHandler } from "./ClickEvent";
 import RaftaEventStore from "./EventStore";
-import { findClickPos, findDOMPath } from "./helper/index";
+import { findClickPos, findDOMPath } from "./helper";
+import { IRaftaEventModule } from "./interfaces/eventInterface";
 import { EventsKeyName } from "./interfaces/eventStoreInterface";
-import RaftaKeyboardEventHandler, { IRaftaKeyboardEvent, IRaftaKeyboardEventHandler } from "./KeyboardEvent";
-import RaftaMouseMoveEventHandler, { IRaftaMouseMoveEventHandler } from "./MouseMoveEvent";
-import RaftaUserVisibilityChangeEventHandler, { IRaftaUserVisibilityChangeHandler } from "./RaftaUserVisibilityChangeEvent";
-import RaftaResizeEventHandler, { IRaftaResizeEventHandler } from "./ResizeEvent";
-import RaftaScrollEventHandler, { IRaftaScrollHandler } from "./ScrollEvent";
-
-
-// TODO
-// mouseEventDebounce : number;
-// resizeEventDebounce : number;
-
+import { 
+    RaftaClickEventHandler,
+    RaftaKeyboardEventHandler,
+    RaftaMouseMoveEventHandler,
+    RaftaResizeEventHandler,
+    RaftaScrollEventHandler,
+    RaftaUserVisibilityChangeEventHandler
+} from "./Event/index";
+import { IRaftaKeyboardEvent } from "./Event/KeyboardEvent";
 
 class RaftaEvent {
     private focusObserverId : NodeJS.Timer | undefined;
     
     private readonly shouldPreventServerConnectOnUserSleep : boolean;
 
-    private keyboardEvent : IRaftaKeyboardEventHandler;
-    private mouseMoveEvent : IRaftaMouseMoveEventHandler;
-    private resizeEvent : IRaftaResizeEventHandler;
-    private clickEvent : IRaftaClickHandler;
-    private scrollEvent : IRaftaScrollHandler;
-    private visibilityChange : IRaftaUserVisibilityChangeHandler;
+    private keyboardEvent : IRaftaEventModule;
+    private mouseMoveEvent : IRaftaEventModule;
+    private resizeEvent : IRaftaEventModule;
+    private clickEvent : IRaftaEventModule;
+    private scrollEvent : IRaftaEventModule;
+    private visibilityChange : IRaftaEventModule;
 
     private eventStore : RaftaEventStore;
 

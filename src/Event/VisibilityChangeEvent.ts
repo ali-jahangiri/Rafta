@@ -1,8 +1,3 @@
-export interface IRaftaUserVisibilityChangeHandler {
-    attachEventToWindow : () => void;
-    terminateEvent : () => void;
-}
-
 class RaftaUserVisibilityChangeEventHandler {
     private parentEventDispatcher : () => void;
     private callbackReference : () => void;

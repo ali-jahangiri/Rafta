@@ -1,8 +1,4 @@
-import { debounce } from "./helper/index";
-
-export interface IRaftaResizeEventHandler {
-    attachEventToWindow : () => void;
-}
+import { debounce } from "../helper/index";
 
 class RaftaResizeEventHandler {
     private readonly resizeDebounce : number;
@@ -37,6 +33,9 @@ class RaftaResizeEventHandler {
         window.addEventListener("resize" , debounce(this.resizeHandler.bind(this) , this.resizeDebounce));
     }
 
+    terminateEvent() {
+        
+    }
 }
 
 
