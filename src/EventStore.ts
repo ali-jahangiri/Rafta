@@ -43,8 +43,9 @@ class RaftaEventStore {
         return clearEmptyEventsList(entireStoreCloned);
     }
 
-    getEventsLength() {
-        
+    eventStoreHaveLength() : any {
+        // console.log(Object.keys(clearEmptyEventsList(this.events)).length);
+        // return false
     }
 
     onEventDispatching(callback : () => void) {

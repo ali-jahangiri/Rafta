@@ -1,5 +1,6 @@
 import RaftaEventStore from "./EventStore";
 import { createErrorFileName } from "./helper/index";
+import { EventsKeyName } from "./interfaces/eventStoreInterface";
 
 class RaftaError {
     private eventStore : RaftaEventStore;
@@ -10,7 +11,7 @@ class RaftaError {
 
     private errorObserverHandler(e : ErrorEvent) {
         this.eventStore.eventDispatcher({
-            event : "error",
+            event : EventsKeyName.ERROR,
             data : {
                 fileName : createErrorFileName(e),
                 stack : e.error.stack,

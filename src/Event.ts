@@ -24,7 +24,9 @@ class RaftaEvent {
 
     constructor(eventStore : RaftaEventStore) {
         this.initialScrollEventListenerDelayForAttachment = 100;
-        this.scrollEventDebounce = 9;
+        
+        // (for detection hard scroll with factor of time & scroll px in near that rise for 2 time in near distance ) scrollEventDebounce = 18;
+        this.scrollEventDebounce = 20;
 
         this.shouldPreventServerConnectOnUserSleep = true;
 
@@ -37,7 +39,7 @@ class RaftaEvent {
     }
 
     private checkIsUserSleep() : boolean {
-        if(this.shouldPreventServerConnectOnUserSleep && !this.eventStore.getEventsLength) {
+        if(this.shouldPreventServerConnectOnUserSleep && !this.eventStore.eventStoreHaveLength()) {
             return false;
         }else return true;
     }
@@ -57,12 +59,15 @@ class RaftaEvent {
     }
 
     private scrollHandler() {
-        const scrollPx = window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop;
+        const scrollPx = window?.pageYOffset || (document?.documentElement || document?.body?.parentNode || document?.body)?.scrollTop;
         
-        this.eventStore.eventDispatcher({
-            event : EventsKeyName.SCROLL,
-            data : Math.round(scrollPx)
-        })
+        console.log(scrollPx);
+        
+
+        // this.eventStore.eventDispatcher({
+        //     event : EventsKeyName.SCROLL,
+        //     data : Math.round(scrollPx)
+        // })
     }
 
     private clickHandler(e : MouseEvent) {
