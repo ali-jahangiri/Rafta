@@ -64,9 +64,8 @@ class RaftaEvent {
         const scrollPx = window?.pageYOffset || (document?.documentElement || document?.body?.parentNode || document?.body)?.scrollTop;
         
         this.eventStore.eventDispatcher({
-            event : EventsKeyName.SCROLL,
             data : Math.round(scrollPx)
-        })
+        } , EventsKeyName.SCROLL);
     }
 
     private clickHandler(e : MouseEvent) {
@@ -76,66 +75,59 @@ class RaftaEvent {
         const selectedElementPosition = findClickPos(e);
 
         this.eventStore.eventDispatcher({
-            event : EventsKeyName.CLICK,
             data : {
                 path : selectedElementPath,
                 position : selectedElementPosition,
             }
-        })
+        } , EventsKeyName.CLICK);
 
     }
 
     private typeHandler(e : IRaftaKeyboardEvent) {
         this.eventStore.eventDispatcher({
-            event : EventsKeyName.TYPE,
             data : e,
-        })
+        } , EventsKeyName.TYPE);
     }
 
     private mouseMoveHandler(e : MouseEvent) {
         this.eventStore.eventDispatcher({
-            event : EventsKeyName.MOUSEMOVE,
             data : {
                 position : {
                     x : e.clientX,
                     y : e.clientY,
                 },
             }
-        })
+        } , EventsKeyName.MOUSEMOVE);
     }
 
     private focusHandler(isFocused : boolean) {
         this.eventStore.eventDispatcher({
-            event : EventsKeyName.FOCUS,
             data : isFocused,
-        })
+        } , EventsKeyName.FOCUS);
     }
 
     private zoomHandler(ratio : number) {
         this.eventStore.eventDispatcher({
-            event : EventsKeyName.ZOOM,
             data : ratio,
-        })
+        } , EventsKeyName.ZOOM);
     }
 
     private resizeHandler() {
         this.eventStore.eventDispatcher({
-            event : EventsKeyName.RESIZE,
             data : {
                 viewport : {
                     height : window.innerHeight,
                     width : window.innerWidth,
                 },
             }
-        })
+        } , EventsKeyName.RESIZE);
     }
 
     private visibilityChangeHandler() {
         const visibilityState = document.visibilityState;
         this.eventStore.eventDispatcher({
-            event : EventsKeyName.VISIBILITY_CHANGE,
             data : visibilityState,
-        })
+        } , EventsKeyName.VISIBILITY_CHANGE);
     }
 
     private attachEventsListener() {

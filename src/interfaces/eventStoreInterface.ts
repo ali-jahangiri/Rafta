@@ -23,13 +23,11 @@ export type TEventType =
     EventsKeyName.ZOOM;
 
 interface IRaftaSingleEvent {
-    event : TEventType;
     data : any;
     time : number;
 }
 
 export interface IRaftaEventDispatcherIncomeParameters {
-    event : TEventType;
     data : any;
 }
 

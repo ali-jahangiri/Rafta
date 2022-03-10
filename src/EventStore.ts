@@ -28,12 +28,12 @@ class RaftaEventStore {
         this.onEventDispatchCallback = () => {};
     }
 
-    eventDispatcher(event : IRaftaEventDispatcherIncomeParameters) : void {
+    eventDispatcher(event : IRaftaEventDispatcherIncomeParameters , eventType :TEventType) : void {
         const enhancedTargetEventWithTime = {
             ...event,
             time : Date.now()
         }
-        this.events[EVENTS_GROUPING_NAME[enhancedTargetEventWithTime.event]].push(enhancedTargetEventWithTime);
+        this.events[EVENTS_GROUPING_NAME[eventType]].push(enhancedTargetEventWithTime);
         this.onEventDispatchCallback();
     }
 
